@@ -12,6 +12,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 @Entity
 @Table(name = "tb_report")
 public class Report implements Serializable{
@@ -21,7 +22,7 @@ public class Report implements Serializable{
     @ManyToOne
     @JoinColumn(name = "usuarioID", nullable = false)
     private User usuario;
-    @ManyToOne
+    @OneToOne
     @JoinColumn(name = "boletoID", nullable = false)
     private Boleto boleto;
     @Column(nullable = false)

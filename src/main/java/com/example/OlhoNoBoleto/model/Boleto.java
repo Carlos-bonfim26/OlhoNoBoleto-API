@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
@@ -12,9 +13,11 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
+
 @Entity
 @Table(name = "tb_boleto")
-public class Boleto implements Serializable{
+public class Boleto implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
@@ -31,6 +34,8 @@ public class Boleto implements Serializable{
     private LocalDateTime dataValidacao;
     @Column(nullable = false)
     private String statusValidacao;
+    @OneToOne(mappedBy = "tb_boleto", cascade = CascadeType.ALL)
+    private Report report;
 
     // Getters and Setters
     public String getLinhaDigitavel() {
@@ -56,6 +61,7 @@ public class Boleto implements Serializable{
     public String getStatusValidacao() {
         return statusValidacao;
     }
+
     public void setLinhaDigitavel(String linhaDigitavel) {
         this.linhaDigitavel = linhaDigitavel;
     }

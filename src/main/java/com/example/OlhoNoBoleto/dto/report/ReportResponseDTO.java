@@ -1,15 +1,16 @@
 package com.example.OlhoNoBoleto.dto.report;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 public class ReportResponseDTO {
-    private Long id;
+    private UUID id;
     private String nomeUsuario;
-    private Long boletoId;
+    private UUID boletoId;
     private String descricaoProblema;
     private LocalDateTime dataReport;
 
-    public ReportResponseDTO(Long id, String nomeUsuario, Long boletoId, String descricaoProblema, LocalDateTime dataReport) {
+    public ReportResponseDTO(UUID id, String nomeUsuario, UUID boletoId, String descricaoProblema, LocalDateTime dataReport) {
         this.id = id;
         this.nomeUsuario = nomeUsuario;
         this.boletoId = boletoId;
@@ -18,13 +19,13 @@ public class ReportResponseDTO {
     }
 
     // getters e setters
-    public Long getId() {
+    public UUID getId() {
         return id;
     }
     public String getNomeUsuario() {
         return nomeUsuario;
     }
-    public Long getBoletoId() {
+    public UUID getBoletoId() {
         return boletoId;
     }
     public String getDescricaoProblema() {
@@ -33,15 +34,8 @@ public class ReportResponseDTO {
     public LocalDateTime getDataReport() {
         return dataReport;
     }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
     public void setNomeUsuario(String nomeUsuario) {
         this.nomeUsuario = nomeUsuario;
-    }
-    public void setBoletoId(Long boletoId) {
-        this.boletoId = boletoId;
     }
     public void setDescricaoProblema(String descricaoProblema) {
         this.descricaoProblema = descricaoProblema;
