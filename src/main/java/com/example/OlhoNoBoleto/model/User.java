@@ -1,21 +1,33 @@
 package com.example.OlhoNoBoleto.model;
 
+import java.io.Serializable;
+import java.util.UUID;
+
 import com.ulegalize.enumeration.EnumRole;
 
-public class User {
-    private Long id;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+@Entity
+@Table(name = "tb_user")
+public class User implements Serializable{
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private UUID id;
+    @Column(nullable = false)
     private String nome;
+    @Column(nullable = false, unique = true)
     private String email;
+    @Column(nullable = false)
     private String senha;
+    @Column(nullable = false)
     private EnumRole role;
 
     // Getters and Setters
-    public Long getId() {
-        return id;
-    }
-    public void setId(Long id) {
-        this.id = id;
-    }
+
     public String getNome() {
         return nome;
     }
