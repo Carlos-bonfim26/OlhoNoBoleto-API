@@ -9,13 +9,21 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Table(name = "tb_beneficiario")
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class Beneficiario implements Serializable{
     private static final long serialVersionUID = 1L;
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
     @Column(nullable = false)
     private String nome;
@@ -28,46 +36,4 @@ public class Beneficiario implements Serializable{
     @Column
     private Integer totalQueixas;
 
-    // Getters and Setters
-    
-
-    public String getNome() {
-        return nome;
-    }
-
-    public String getCnpjCpf() {
-        return cnpjCpf;
-    }
-
-    public String getBanco() {
-        return banco;
-    }
-
-    public String getAgencia() {
-        return agencia;
-    }
-
-    public Integer getTotalQueixas() {
-        return totalQueixas;
-    }
-
-    public void setNome(String nome) {
-        this.nome = nome;
-    }
-
-    public void setCnpjCpf(String cnpjCpf) {
-        this.cnpjCpf = cnpjCpf;
-    }
-
-    public void setBanco(String banco) {
-        this.banco = banco;
-    }
-
-    public void setAgencia(String agencia) {
-        this.agencia = agencia;
-    }
-
-    public void setTotalQueixas(Integer totalQueixas) {
-        this.totalQueixas = totalQueixas;
-    }
 }
