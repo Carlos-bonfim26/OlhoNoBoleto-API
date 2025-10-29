@@ -12,18 +12,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.OlhoNoBoleto.dto.report.ReportResponseDTO;
 
 
-import com.example.OlhoNoBoleto.service.ReportService;
-
 @RestController
 @RequestMapping("/reports")
 public class ReportController {
 
-      @Autowired
-    private ReportService reportService;
-
-    @PostMapping
-    public ResponseEntity<ReportResponseDTO> registrar(@RequestBody ReportResponseDTO report) {
-        ReportResponseDTO response = reportService.createReport(report);
-        return ResponseEntity.ok(response);
-    }
 }
