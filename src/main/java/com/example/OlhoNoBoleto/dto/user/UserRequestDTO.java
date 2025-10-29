@@ -1,6 +1,5 @@
 package com.example.OlhoNoBoleto.dto.user;
 
-import java.util.UUID;
 
 import com.example.OlhoNoBoleto.enums.Role;
 

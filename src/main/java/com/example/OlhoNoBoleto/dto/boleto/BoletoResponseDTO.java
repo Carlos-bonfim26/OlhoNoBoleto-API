@@ -3,6 +3,14 @@ package com.example.OlhoNoBoleto.dto.boleto;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class BoletoResponseDTO {
     private UUID id;
     private String banco;
@@ -11,12 +19,4 @@ public class BoletoResponseDTO {
     private LocalDateTime dataValidacao;
     private String statusValidacao;
 
-    public BoletoResponseDTO(UUID id, String banco, String beneficiarioNome, Double valor, LocalDateTime dataValidacao, String statusValidacao) {
-        this.id = id;
-        this.banco = banco;
-        this.beneficiarioNome = beneficiarioNome;
-        this.valor = valor;
-        this.dataValidacao = dataValidacao;
-        this.statusValidacao = statusValidacao;
-    }
 }

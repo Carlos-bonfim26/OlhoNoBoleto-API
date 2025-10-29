@@ -1,7 +1,7 @@
 package com.example.OlhoNoBoleto.dto.user;
 
 import com.example.OlhoNoBoleto.enums.Role;
-import com.example.OlhoNoBoleto.model.User;
+
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

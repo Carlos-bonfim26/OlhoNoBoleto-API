@@ -5,8 +5,6 @@ import java.util.UUID;
 
 import com.example.OlhoNoBoleto.enums.Role;
 
-import com.example.OlhoNoBoleto.dto.user.UserRequestDTO;
-
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

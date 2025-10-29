@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.OlhoNoBoleto.dto.user.LoginRequestDTO;
+// import com.example.OlhoNoBoleto.dto.user.LoginRequestDTO;
 import com.example.OlhoNoBoleto.dto.user.UserRequestDTO;
 import com.example.OlhoNoBoleto.model.User;
 // import com.example.OlhoNoBoleto.service.AuthService;
