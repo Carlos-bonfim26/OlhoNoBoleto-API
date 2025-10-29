@@ -3,28 +3,31 @@ package com.example.OlhoNoBoleto.config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
+@EnableWebSecurity
 public class SecurityConfig {
-@Bean
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+
+    @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-    http
-            // 🔓 Desativa o CSRF, necessário para aceitar POST via Insomnia
-            .csrf(csrf -> csrf.disable())
-            
-            // 🔓 Permite acesso livre a /cadastro e /login
+        http
+            .csrf(csrf -> csrf.disable()) // permite POSTs via Postman/Insomnia
+            .headers(headers -> headers.frameOptions(frame -> frame.disable())) // para H2 console
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/cadastro", "/login", "/h2-console/**").permitAll()
-                .anyRequest().permitAll() // (temporário) libera tudo para testes
+                .anyRequest().permitAll() // libera todas as rotas
             )
-            
-            //Desativa o formulário de login padrão
             .formLogin(form -> form.disable())
-            
-            // Desativa autenticação HTTP Basic
             .httpBasic(basic -> basic.disable());
-        
+
         return http.build();
     }
 }

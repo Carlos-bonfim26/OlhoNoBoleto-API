@@ -11,15 +11,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.OlhoNoBoleto.dto.boleto.BoletoRequestDTO;
 import com.example.OlhoNoBoleto.model.Boleto;
-import com.example.OlhoNoBoleto.service.BoletoService;
+
 @RestController
 @RequestMapping("/boleto")
 public class BoletoController {
-    @Autowired
-    private BoletoService boletoService;
 
-    @PostMapping("/validate")
-    public ResponseEntity<Boleto> validarBoleto(@RequestBody BoletoRequestDTO request) {
-        return null;
-    }
 }

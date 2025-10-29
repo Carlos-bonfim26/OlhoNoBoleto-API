@@ -3,10 +3,15 @@ package com.example.OlhoNoBoleto.model;
 import java.io.Serializable;
 import java.util.UUID;
 
-import com.ulegalize.enumeration.EnumRole;
+import com.example.OlhoNoBoleto.enums.Role;
+
+import com.example.OlhoNoBoleto.dto.user.UserRequestDTO;
+
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -31,7 +36,8 @@ public class User implements Serializable{
     private String email;
     @Column(nullable = false)
     private String senha;
-    @Column(nullable = false)
-    private EnumRole role;
+    @Column(columnDefinition = "INT DEFAULT 0")
+    @Enumerated(EnumType.ORDINAL)
+    private Role role;
 
 }
