@@ -1,14 +1,16 @@
 package com.example.OlhoNoBoleto.dto.beneficiario;
 
+import java.util.UUID;
+
 public class BeneficiarioResponseDTO {
-     private Long id;
+     private UUID id;
     private String nome;
     private String cnpjCpf;
     private String banco;
     private String agencia;
     private Integer totalQueixas;
 
-    public BeneficiarioResponseDTO(Long id, String nome, String cnpjCpf, String banco, String agencia, Integer totalQueixas) {
+    public BeneficiarioResponseDTO(UUID id, String nome, String cnpjCpf, String banco, String agencia, Integer totalQueixas) {
         this.id = id;
         this.nome = nome;
         this.banco = banco;
@@ -17,7 +19,7 @@ public class BeneficiarioResponseDTO {
     }
 
    // getters and setters
-    public Long getId() {
+    public UUID getId() {
         return id;
     }
 
