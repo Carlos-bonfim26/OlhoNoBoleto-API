@@ -15,9 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.OlhoNoBoleto.dto.beneficiario.BeneficiarioRequestDTO;
-import com.example.OlhoNoBoleto.dto.user.UserRequestDTO;
 import com.example.OlhoNoBoleto.model.Beneficiario;
-import com.example.OlhoNoBoleto.model.User;
 import com.example.OlhoNoBoleto.repository.BeneficiarioRepository;
 
 import jakarta.validation.Valid;
