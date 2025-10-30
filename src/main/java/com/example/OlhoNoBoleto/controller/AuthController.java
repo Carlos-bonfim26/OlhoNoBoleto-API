@@ -30,7 +30,7 @@ public class AuthController {
     private UsuarioRepository usuarioRepository;
     @Autowired
     private PasswordEncoder passwordEncoder;
-
+    
     @PostMapping("/cadastro")
     public ResponseEntity<?> cadastro(@RequestBody @Valid UserRequestDTO usuario) {
         if (usuarioRepository.findByEmail(usuario.getEmail()).isPresent()) {

@@ -12,7 +12,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class BeneficiarioRequestDTO {
-   private UUID id;
+   private UUID beneficiarioId;
     private String nome;
     private String cnpjCpf;
     private String banco;
