@@ -5,14 +5,13 @@ import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-// import com.example.OlhoNoBoleto.dto.user.LoginRequestDTO;
+import com.example.OlhoNoBoleto.dto.user.LoginRequestDTO;
 import com.example.OlhoNoBoleto.dto.user.UserRequestDTO;
 import com.example.OlhoNoBoleto.model.User;
 // import com.example.OlhoNoBoleto.service.AuthService;
@@ -45,7 +44,15 @@ public class AuthController {
         System.out.println(newUser);
         return ResponseEntity.ok(newUser);
     }
-
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody @Valid LoginRequestDTO loginRequest) {
+        User user = usuarioRepository.findByEmail(loginRequest.getEmail())
+                .orElseThrow(() -> new RuntimeException("Usuário ou senha inválidos"));
+        if (!passwordEncoder.matches(loginRequest.getSenha(), user.getSenha())) {
+            return ResponseEntity.badRequest().body("Usuário ou senha inválidos");
+        }
+        return ResponseEntity.ok("Login bem-sucedido para o usuário: " + loginRequest.getEmail());
+    }
     @PutMapping("atualizar/{id}")
     public ResponseEntity<?> atualizarUsuario(@RequestBody @Valid UserRequestDTO usuario, @PathVariable UUID id) {
         User updatedUser = usuarioRepository.findById(id)
@@ -65,11 +72,4 @@ public class AuthController {
         return ResponseEntity.ok(allUsers);
     }
 
-    @DeleteMapping("/deletar/{id}")
-    public ResponseEntity<?> deletarUsuario(@PathVariable UUID id) {
-        User userToDelete = usuarioRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Usuário não encontrado com o ID: " + id));
-        usuarioRepository.delete(userToDelete);
-        return ResponseEntity.ok("Usuário deletado com sucesso.");
-    }
 }

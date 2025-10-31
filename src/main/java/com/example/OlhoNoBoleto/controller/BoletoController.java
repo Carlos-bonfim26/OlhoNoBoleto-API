@@ -72,11 +72,4 @@ public class BoletoController {
         return ResponseEntity.ok(updateBoleto);
     }
 
-    @DeleteMapping("/deletar/{id}")
-    public ResponseEntity<?> deletarBoleto(@PathVariable UUID id) {
-        Boleto boletoToDelete = boletoRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Boleto não encontrado com o ID: " + id));
-        boletoRepository.delete(boletoToDelete);
-        return ResponseEntity.ok("Boleto deletado com sucesso.");
-    }
 }

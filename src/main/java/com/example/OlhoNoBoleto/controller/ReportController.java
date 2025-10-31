@@ -80,11 +80,4 @@ public class ReportController {
         return ResponseEntity.ok(updateReport);
     }
 
-    @DeleteMapping("/deletar/{id}")
-    public ResponseEntity<?> deletarReport(@PathVariable UUID id) {
-        Report reportToDelete = reportRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Report não encontrado com o ID: " + id));
-        reportRepository.delete(reportToDelete);
-        return ResponseEntity.ok("Report deletado com sucesso.");
-    }
 }

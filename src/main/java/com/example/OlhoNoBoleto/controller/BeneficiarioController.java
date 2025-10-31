@@ -64,12 +64,5 @@ public class BeneficiarioController {
         beneficiarioRepository.save(updateBeneficiario);
         return ResponseEntity.ok(updateBeneficiario);
     }
-
-      @DeleteMapping("/deletar/{id}")
-    public ResponseEntity<?> deletarBeneficiario(@PathVariable UUID id) {
-        Beneficiario beneficiarioToDelete = beneficiarioRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Beneficiário não encontrado com o ID: " + id));
-        beneficiarioRepository.delete(beneficiarioToDelete);
-        return ResponseEntity.ok("Beneficiário deletado com sucesso.");
-    }
+    
 }
