@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.OlhoNoBoleto.dto.user.LoginRequestDTO;
 // import com.example.OlhoNoBoleto.dto.user.LoginRequestDTO;
 import com.example.OlhoNoBoleto.dto.user.UserRequestDTO;
 import com.example.OlhoNoBoleto.model.User;
@@ -30,7 +31,21 @@ public class AuthController {
     private UsuarioRepository usuarioRepository;
     @Autowired
     private PasswordEncoder passwordEncoder;
-    
+
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody @Valid LoginRequestDTO usuario) {
+        var user = usuarioRepository.findByEmail(usuario.getEmail());
+        if (user.isPresent()) {
+            boolean senhaCorreta = passwordEncoder.matches(usuario.getSenha(), user.get().getSenha());
+            if (senhaCorreta) {
+                return ResponseEntity.ok(user.get());
+            } else {
+                return ResponseEntity.status(401).body("Senha incorreta");
+            }
+        } else {
+            return ResponseEntity.status(404).body("Usuário não encontrado");
+        }
+    }
     @PostMapping("/cadastro")
     public ResponseEntity<?> cadastro(@RequestBody @Valid UserRequestDTO usuario) {
         if (usuarioRepository.findByEmail(usuario.getEmail()).isPresent()) {
@@ -65,11 +80,4 @@ public class AuthController {
         return ResponseEntity.ok(allUsers);
     }
 
-    @DeleteMapping("/deletar/{id}")
-    public ResponseEntity<?> deletarUsuario(@PathVariable UUID id) {
-        User userToDelete = usuarioRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Usuário não encontrado com o ID: " + id));
-        usuarioRepository.delete(userToDelete);
-        return ResponseEntity.ok("Usuário deletado com sucesso.");
-    }
 }

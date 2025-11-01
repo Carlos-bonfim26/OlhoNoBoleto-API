@@ -6,9 +6,8 @@ import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
+
 @Getter
-@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 public class ReportResponseDTO {
@@ -17,9 +16,4 @@ public class ReportResponseDTO {
     private UUID boletoId;
     private String descricaoProblema;
     private LocalDateTime dataReport;
-
- 
-   
 }
-
-

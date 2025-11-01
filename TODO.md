@@ -1,0 +1,3 @@
+- [x] Edit ReportRequest.java to change boletoId from Boleto to UUID
+- [x] Edit ReportController.java to inject BoletoRepository and fetch Boleto by ID in cadastro method
+- [ ] Provide example JSON for POST request in Insomnia
