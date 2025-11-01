@@ -1,5 +1,8 @@
 package com.example.OlhoNoBoleto.controller;
 
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
+
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,9 +16,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.OlhoNoBoleto.dto.user.LoginRequestDTO;
 import com.example.OlhoNoBoleto.dto.user.UserRequestDTO;
+import com.example.OlhoNoBoleto.dto.user.UserResponseDTO;
 import com.example.OlhoNoBoleto.model.User;
 // import com.example.OlhoNoBoleto.service.AuthService;
 import com.example.OlhoNoBoleto.repository.UsuarioRepository;
+import com.example.OlhoNoBoleto.service.AuthService;
 
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -29,7 +34,9 @@ public class AuthController {
     private UsuarioRepository usuarioRepository;
     @Autowired
     private PasswordEncoder passwordEncoder;
-    
+    @Autowired
+    private AuthService authService;
+
     @PostMapping("/cadastro")
     public ResponseEntity<?> cadastro(@RequestBody @Valid UserRequestDTO usuario) {
         if (usuarioRepository.findByEmail(usuario.getEmail()).isPresent()) {
@@ -44,6 +51,7 @@ public class AuthController {
         System.out.println(newUser);
         return ResponseEntity.ok(newUser);
     }
+
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody @Valid LoginRequestDTO loginRequest) {
         User user = usuarioRepository.findByEmail(loginRequest.getEmail())
@@ -53,17 +61,23 @@ public class AuthController {
         }
         return ResponseEntity.ok("Login bem-sucedido para o usuário: " + loginRequest.getEmail());
     }
-    @PutMapping("atualizar/{id}")
-    public ResponseEntity<?> atualizarUsuario(@RequestBody @Valid UserRequestDTO usuario, @PathVariable UUID id) {
-        User updatedUser = usuarioRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Usuário não encontrado com o ID: " + id));
-        updatedUser.setNome(usuario.getNome());
-        updatedUser.setEmail(usuario.getEmail());
-        updatedUser.setSenha(passwordEncoder.encode(usuario.getSenha()));
-        updatedUser.setRole(usuario.getRole() != null ? usuario.getRole() : updatedUser.getRole());
-        usuarioRepository.save(updatedUser);
 
-        return ResponseEntity.ok(updatedUser);
+    @PutMapping("atualizar/{id}")
+    public ResponseEntity<?> atualizarUsuario(@RequestBody @Valid UserRequestDTO usuario, @PathVariable UUID id,
+            Authentication authenticator) {
+        UserDetails userLogado = (UserDetails) authenticator.getPrincipal(); 
+        User userDoBanco = usuarioRepository.findByEmail(userLogado.getUsername())
+                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+
+        boolean isAdmin = userLogado.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+
+        if (isAdmin || userDoBanco.getId().equals(id)) {
+            UserResponseDTO updated = authService.atualizarUsuario(id, usuario);
+            return ResponseEntity.ok(updated);
+        }
+
+        return ResponseEntity.status(403).body("Você não tem permissão para atualizar este usuário.");
     }
 
     @GetMapping("/usuarios")

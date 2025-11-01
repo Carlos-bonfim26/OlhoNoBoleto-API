@@ -1,11 +1,9 @@
 package com.example.OlhoNoBoleto.controller;
 
-import java.util.List;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -15,9 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.OlhoNoBoleto.dto.beneficiario.BeneficiarioRequestDTO;
-import com.example.OlhoNoBoleto.dto.user.UserRequestDTO;
 import com.example.OlhoNoBoleto.model.Beneficiario;
-import com.example.OlhoNoBoleto.model.User;
 import com.example.OlhoNoBoleto.repository.BeneficiarioRepository;
 
 import jakarta.validation.Valid;
@@ -64,5 +60,5 @@ public class BeneficiarioController {
         beneficiarioRepository.save(updateBeneficiario);
         return ResponseEntity.ok(updateBeneficiario);
     }
-    
+
 }
