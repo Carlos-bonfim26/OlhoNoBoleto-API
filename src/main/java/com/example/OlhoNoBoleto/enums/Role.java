@@ -1,6 +1,9 @@
 package com.example.OlhoNoBoleto.enums;
 
+import lombok.Getter;
+
+@Getter
 public enum Role {
-USER,
-ADMIN
+ROLE_USER,
+ROLE_ADMIN
 }

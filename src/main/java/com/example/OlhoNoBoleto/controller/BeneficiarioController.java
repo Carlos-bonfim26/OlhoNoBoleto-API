@@ -1,11 +1,9 @@
 package com.example.OlhoNoBoleto.controller;
 
-import java.util.List;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -63,11 +61,4 @@ public class BeneficiarioController {
         return ResponseEntity.ok(updateBeneficiario);
     }
 
-      @DeleteMapping("/deletar/{id}")
-    public ResponseEntity<?> deletarBeneficiario(@PathVariable UUID id) {
-        Beneficiario beneficiarioToDelete = beneficiarioRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Beneficiário não encontrado com o ID: " + id));
-        beneficiarioRepository.delete(beneficiarioToDelete);
-        return ResponseEntity.ok("Beneficiário deletado com sucesso.");
-    }
 }

@@ -1,27 +1,48 @@
-// package com.example.OlhoNoBoleto.service;
+package com.example.OlhoNoBoleto.service;
 
-// import org.springframework.beans.factory.annotation.Autowired;
-// import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
+import java.util.UUID;
 
-// import com.example.OlhoNoBoleto.dto.user.UserRequestDTO;
-// import com.example.OlhoNoBoleto.model.User;
-// import com.example.OlhoNoBoleto.repository.UsuarioRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 
-// import org.springframework.security.crypto.password.PasswordEncoder;
+import com.example.OlhoNoBoleto.dto.user.UserRequestDTO;
+import com.example.OlhoNoBoleto.dto.user.UserResponseDTO;
+import com.example.OlhoNoBoleto.model.User;
+import com.example.OlhoNoBoleto.repository.UsuarioRepository;
 
-// public class AuthService {
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+@Service
+public class AuthService {
 
-//     @Autowired
-//     private UsuarioRepository usuarioRepository;
+    @Autowired
+    private UsuarioRepository usuarioRepository;
 
-//     @Autowired
-//     private PasswordEncoder passwordEncoder;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
-//     public User cadastrar(UserRequestDTO usuario) {
-//         return null;
-//     }
+    public User cadastrar(UserRequestDTO usuario) {
+        return null;
+    }
 
-//     public User login(String email, String senha) {
-//         return null;
-//     }
-// }
+    public User login(String email, String senha) {
+        return null;
+    }
+
+    public UserResponseDTO atualizarUsuario(UUID id, UserRequestDTO usuario) {
+        User user = usuarioRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+        user.setNome(usuario.getNome());
+        user.setEmail(usuario.getEmail());
+
+        if (usuario.getSenha() != null && !usuario.getSenha().isBlank()) {
+            user.setSenha(passwordEncoder.encode(usuario.getSenha()));
+        }
+
+        if (usuario.getRole() != null) {
+            user.setRole(usuario.getRole());
+        }
+
+        usuarioRepository.save(user);
+        return new UserResponseDTO(user.getId(), user.getNome(), user.getEmail(), user.getRole());
+    }
+}
