@@ -6,9 +6,8 @@ import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
+
 @Getter
-@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 public class BoletoResponseDTO {
@@ -18,5 +17,4 @@ public class BoletoResponseDTO {
     private Double valor;
     private LocalDateTime dataValidacao;
     private String statusValidacao;
-
 }
