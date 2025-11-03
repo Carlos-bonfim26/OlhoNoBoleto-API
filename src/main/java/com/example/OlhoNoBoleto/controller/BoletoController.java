@@ -14,10 +14,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.OlhoNoBoleto.dto.boleto.BoletoRequestDTO;
+import com.example.OlhoNoBoleto.dto.boleto.BoletoResponseDTO;
+import com.example.OlhoNoBoleto.dto.boleto.BoletoValidateRequestDTO;
 import com.example.OlhoNoBoleto.model.Beneficiario;
 import com.example.OlhoNoBoleto.model.Boleto;
 import com.example.OlhoNoBoleto.repository.BeneficiarioRepository;
 import com.example.OlhoNoBoleto.repository.BoletoRepository;
+import com.example.OlhoNoBoleto.service.BoletoService;
 
 import jakarta.validation.Valid;
 
@@ -30,6 +33,14 @@ public class BoletoController {
 
     @Autowired
     private BeneficiarioRepository beneficiarioRepository;
+    @Autowired
+    private BoletoService boletoService;
+
+    @PostMapping("/validate")
+    public ResponseEntity<BoletoResponseDTO> validar(@RequestBody BoletoValidateRequestDTO request) {
+        BoletoResponseDTO response = boletoService.validarBoleto(request);
+        return ResponseEntity.ok(response);
+    }
 
     @GetMapping("/boletos")
     public ResponseEntity<?> mostrarBoletos() {
@@ -42,9 +53,11 @@ public class BoletoController {
         if (boletoRepository.findByLinhaDigitavel(boletoRequest.getLinhaDigitavel()).isEmpty() == false) {
             return ResponseEntity.badRequest().body("Linha digitável já cadastrada");
         }
-        
-        Beneficiario beneficiario = beneficiarioRepository.findById(UUID.fromString(boletoRequest.getBeneficiarioId().toString()))
-                .orElseThrow(() -> new RuntimeException("Beneficiário não encontrado com o ID: " + boletoRequest.getBeneficiarioId()));
+
+        Beneficiario beneficiario = beneficiarioRepository
+                .findById(UUID.fromString(boletoRequest.getBeneficiarioId().toString()))
+                .orElseThrow(() -> new RuntimeException(
+                        "Beneficiário não encontrado com o ID: " + boletoRequest.getBeneficiarioId()));
         Boleto newBoleto = new Boleto();
         newBoleto.setLinhaDigitavel(boletoRequest.getLinhaDigitavel());
         newBoleto.setBanco(boletoRequest.getBanco());
@@ -61,8 +74,10 @@ public class BoletoController {
             @PathVariable UUID id) {
         Boleto updateBoleto = boletoRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Boleto não encontrado com o ID: " + id));
-        Beneficiario beneficiario = beneficiarioRepository.findById(UUID.fromString(boletoRequest.getBeneficiarioId().toString()))
-                .orElseThrow(() -> new RuntimeException("Beneficiário não encontrado com o ID: " + boletoRequest.getBeneficiarioId()));
+        Beneficiario beneficiario = beneficiarioRepository
+                .findById(UUID.fromString(boletoRequest.getBeneficiarioId().toString()))
+                .orElseThrow(() -> new RuntimeException(
+                        "Beneficiário não encontrado com o ID: " + boletoRequest.getBeneficiarioId()));
         updateBoleto.setLinhaDigitavel(boletoRequest.getLinhaDigitavel());
         updateBoleto.setBanco(boletoRequest.getBanco());
         updateBoleto.setBeneficiario(beneficiario);
