@@ -1,6 +1,7 @@
 package com.example.OlhoNoBoleto.service;
+
 import java.time.LocalDateTime;
-import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -9,6 +10,7 @@ import com.example.OlhoNoBoleto.dto.boleto.BoletoResponseDTO;
 import com.example.OlhoNoBoleto.dto.boleto.BoletoValidateRequestDTO;
 import com.example.OlhoNoBoleto.model.Beneficiario;
 import com.example.OlhoNoBoleto.repository.BeneficiarioRepository;
+import com.example.OlhoNoBoleto.repository.ReportRepository;
 
 @Service
 public class BoletoService {
@@ -16,49 +18,91 @@ public class BoletoService {
     @Autowired
     private BeneficiarioRepository beneficiarioRepository;
 
-    public BoletoResponseDTO validarBoleto(BoletoValidateRequestDTO request) {
+    @Autowired
+    private ReportRepository reportRepository;
 
+    public BoletoResponseDTO validarBoleto(BoletoValidateRequestDTO request) {
         String linha = request.getLinhaDigitavel().trim();
 
-        // Valida tamanho
         if (linha.length() != 47 && linha.length() != 48) {
-            throw new IllegalArgumentException("Linha digitável inválida: deve ter 47 ou 48 dígitos.");
+            throw new IllegalArgumentException("Linha digitável inválida: deve conter 47 ou 48 dígitos.");
         }
 
-        // Extrai o código do banco (3 primeiros dígitos)
+        // Extrai código do banco e obtém o nome
         String codigoBanco = linha.substring(0, 3);
+        String nomeBanco = obterNomeBanco(codigoBanco);
 
-        // Simula o valor extraído (nas posições certas)
+        // Extrai valor e CNPJ/CPF do beneficiário usando o seu método
         double valor = extrairValor(linha);
-
-        // Simula o CNPJ/CPF do beneficiário conforme regras do projeto
         String cnpjCpfBeneficiario = extrairCnpjCpfDoBeneficiario(linha);
-        // Busca beneficiário (se existir)
-        List<Beneficiario> beneficiarios = beneficiarioRepository.findByCnpjCpf(cnpjCpfBeneficiario);
-        Beneficiario beneficiario = (beneficiarios == null || beneficiarios.isEmpty()) ? null : beneficiarios.get(0);
 
-        // Monta a resposta
-        // Monta a resposta
+        // Busca o beneficiário no banco de dados
+        Beneficiario beneficiario = beneficiarioRepository.findByCnpjCpf(cnpjCpfBeneficiario).orElse(null);
+
+        int qtdDenuncias = 0;
+        if (beneficiario != null) {
+            qtdDenuncias = reportRepository.countByBeneficiario(beneficiario);
+        }
+
+        // Define status e recomendação
+        String status = "válido";
+        String recomendacao = "PAGAR";
+        String motivo = null;
+
+        if (nomeBanco.equals("Banco desconhecido")) {
+            status = "suspeito";
+            recomendacao = "NÃO PAGAR";
+            motivo = "Banco não reconhecido.";
+        } else if (qtdDenuncias > 0) {
+            status = "suspeito";
+            recomendacao = "NÃO PAGAR";
+            motivo = "Beneficiário com denúncias registradas.";
+        }
+
+        // Monta a resposta final
         BoletoResponseDTO response = new BoletoResponseDTO();
         response.setLinhaDigitavel(linha);
-        response.setBanco(codigoBanco);
-        response.setBeneficiarioNome(beneficiario != null ? beneficiario.getNome() : "Desconhecido");
+        response.setBanco(nomeBanco);
+        response.setBeneficiarioNome(beneficiario != null ? beneficiario.getNome() : "Instituição bancária");
         response.setValor(valor);
         response.setDataValidacao(LocalDateTime.now());
-        response.setStatusValidacao("válido");
+        response.setStatusValidacao(status);
         response.setMensagem("Boleto processado com sucesso.");
+        response.setMotivo(motivo);
+        response.setRecomendacao(recomendacao);
 
         return response;
     }
 
-    // Métodos auxiliares simulando a lógica de extração
-    private double extrairValor(String linha) {
-        // Exemplo: últimos 10 dígitos = valor
-        String valorStr = linha.substring(linha.length() - 10);
-        return Double.parseDouble(valorStr) / 100;
+    private String obterNomeBanco(String codigoBanco) {
+        Map<String, String> bancos = Map.ofEntries(
+            Map.entry("001", "Banco do Brasil"),
+            Map.entry("033", "Santander"),
+            Map.entry("104", "Caixa Econômica Federal"),
+            Map.entry("237", "Bradesco"),
+            Map.entry("341", "Itaú Unibanco"),
+            Map.entry("077", "Banco Inter"),
+            Map.entry("212", "Banco Original"),
+            Map.entry("260", "Nubank"),
+            Map.entry("290", "PagSeguro"),
+            Map.entry("323", "Mercado Pago"),
+            Map.entry("746", "Banco Modal"),
+            Map.entry("748", "Sicredi"),
+            Map.entry("756", "Sicoob")
+        );
+        return bancos.getOrDefault(codigoBanco, "Banco desconhecido");
     }
 
-   private String extrairCnpjCpfDoBeneficiario(String linha) {
+    private double extrairValor(String linha) {
+        String valorStr = linha.substring(linha.length() - 10);
+        try {
+            return Double.parseDouble(valorStr) / 100;
+        } catch (NumberFormatException e) {
+            return 0.0;
+        }
+    }
+
+    private String extrairCnpjCpfDoBeneficiario(String linha) {
     // Mapeamento de códigos de bancos (COMPE) para CNPJ/CPF padrão
     // Bancos Tradicionais
     if (linha.startsWith("001")) return "00000000000191"; // Banco do Brasil
@@ -80,7 +124,7 @@ public class BoletoService {
     // Bancos Digitais e Fintechs
     if (linha.startsWith("077")) return "92875780000131"; // Banco Inter
     if (linha.startsWith("212")) return "92894922000143"; // Banco Original
-    if (linha.startsWith("260")) return "09313766000194"; // Nubank
+    if (linha.startsWith("260")) return "09313766000194"; // Nu Pagamentos (Nubank)
     if (linha.startsWith("290")) return "08561701000109"; // PagSeguro
     if (linha.startsWith("323")) return "01027058000191"; // Mercado Pago
     if (linha.startsWith("332")) return "13140088000130"; // Acesso Soluções de Pagamento

@@ -5,9 +5,9 @@ import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.example.OlhoNoBoleto.model.Beneficiario;
-import java.util.List;
+import java.util.Optional;
 
 
 public interface BeneficiarioRepository extends JpaRepository<Beneficiario, UUID> {
-    List<Beneficiario> findByCnpjCpf(String cnpjCpf);
+    Optional<Beneficiario> findByCnpjCpf(String cnpjCpf);
 }

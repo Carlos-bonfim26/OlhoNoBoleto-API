@@ -1,12 +1,14 @@
 package com.example.OlhoNoBoleto.repository;
 
-import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import com.example.OlhoNoBoleto.model.Beneficiario;
 import com.example.OlhoNoBoleto.model.Report;
 
 public interface ReportRepository extends JpaRepository<Report, UUID> {
-    List<Report> findByDescricao(String descricao);
+    Optional<Report> findByDescricao(String descricao);
+    int countByBeneficiario(Beneficiario beneficiario);
 }

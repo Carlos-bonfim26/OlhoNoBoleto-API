@@ -17,13 +17,14 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
+
 @Entity
 @Table(name = "tb_report")
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class Report implements Serializable{
+public class Report implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
@@ -33,6 +34,9 @@ public class Report implements Serializable{
     @OneToOne
     @JoinColumn(name = "boletoID", nullable = false)
     private Boleto boleto;
+    @ManyToOne
+    @JoinColumn(name = "beneficiarioID", nullable = false)
+    private Beneficiario beneficiario;
     @Column(nullable = false)
     private String descricao;
     @Column(nullable = false)

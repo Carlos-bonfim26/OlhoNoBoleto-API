@@ -19,5 +19,6 @@ public class BoletoResponseDTO {
     private LocalDateTime dataValidacao;
     private String statusValidacao;
     private String mensagem;
-
+    private String motivo;
+    private String recomendacao;
 }
