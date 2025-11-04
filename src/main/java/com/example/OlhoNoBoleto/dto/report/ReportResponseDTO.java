@@ -14,6 +14,9 @@ public class ReportResponseDTO {
     private UUID id;
     private String nomeUsuario;
     private UUID boletoId;
+    private UUID beneficiarioId;
     private String descricaoProblema;
     private LocalDateTime dataReport;
+
+   
 }

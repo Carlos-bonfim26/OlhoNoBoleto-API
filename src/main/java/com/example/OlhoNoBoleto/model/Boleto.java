@@ -31,7 +31,7 @@ public class Boleto implements Serializable {
     private UUID id;
     @Column(nullable = false, unique = true)
     private String linhaDigitavel;
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private String banco;
     @ManyToOne
     @JoinColumn(name = "beneficiarioID", nullable = false)

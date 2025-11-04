@@ -1,5 +1,7 @@
 package com.example.OlhoNoBoleto.dto.boleto;
 
+import java.util.UUID;
+
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -12,6 +14,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class BoletoRequestDTO {
+    private UUID id;
     @NotBlank(message = "Linha digitável é obrigatória")
     private String linhaDigitavel;
     @NotBlank(message = "Banco é obrigatório")

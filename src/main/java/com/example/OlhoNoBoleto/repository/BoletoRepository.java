@@ -9,4 +9,5 @@ import com.example.OlhoNoBoleto.model.Boleto;
 
 public interface BoletoRepository extends JpaRepository<Boleto, UUID> {
     Optional<Boleto> findByLinhaDigitavel(String linhaDigitavel);
+    Optional<Boleto> findById(UUID id);
 }
