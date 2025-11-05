@@ -1,5 +1,7 @@
 package com.example.OlhoNoBoleto.controller;
 
+import java.util.UUID;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,9 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.OlhoNoBoleto.dto.report.ReportRequest;
 import com.example.OlhoNoBoleto.dto.report.ReportResponseDTO;
-import com.example.OlhoNoBoleto.repository.BoletoRepository;
 import com.example.OlhoNoBoleto.repository.ReportRepository;
-import com.example.OlhoNoBoleto.repository.UsuarioRepository;
 import com.example.OlhoNoBoleto.service.ReportService;
 
 import jakarta.validation.Valid;
@@ -27,8 +27,6 @@ public class ReportController {
 
         private final ReportRepository reportRepository;
         private final ReportService reportService;
-        private final UsuarioRepository usuarioRepository;
-        private final BoletoRepository boletoRepository;
 
         @GetMapping("/reports")
         public ResponseEntity<?> mostrarReports() {
@@ -42,4 +40,12 @@ public class ReportController {
                 return ResponseEntity.status(HttpStatus.CREATED).body(response);
         }
 
+        @PutMapping("/{id}")
+        public ResponseEntity<ReportResponseDTO> atualizarDescricao(@PathVariable UUID id,
+                        @RequestBody String novaDescricao) {
+                ReportResponseDTO atualizado = reportService.atualizarDescricao(id, novaDescricao);
+                return ResponseEntity.ok(atualizado);
+        }
+
+        
 }
