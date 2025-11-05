@@ -74,24 +74,49 @@ public class BoletoService {
         return response;
     }
 
-    private String obterNomeBanco(String codigoBanco) {
-        Map<String, String> bancos = Map.ofEntries(
-            Map.entry("001", "Banco do Brasil"),
-            Map.entry("033", "Santander"),
-            Map.entry("104", "Caixa Econômica Federal"),
-            Map.entry("237", "Bradesco"),
-            Map.entry("341", "Itaú Unibanco"),
-            Map.entry("077", "Banco Inter"),
-            Map.entry("212", "Banco Original"),
-            Map.entry("260", "Nubank"),
-            Map.entry("290", "PagSeguro"),
-            Map.entry("323", "Mercado Pago"),
-            Map.entry("746", "Banco Modal"),
-            Map.entry("748", "Sicredi"),
-            Map.entry("756", "Sicoob")
-        );
-        return bancos.getOrDefault(codigoBanco, "Banco desconhecido");
-    }
+   private String obterNomeBanco(String codigoBanco) {
+    Map<String, String> bancos = Map.ofEntries(
+        // Bancos Tradicionais
+        Map.entry("001", "Banco do Brasil"),
+        Map.entry("033", "Santander"),
+        Map.entry("104", "Caixa Econômica Federal"),
+        Map.entry("237", "Bradesco"),
+        Map.entry("341", "Itaú Unibanco"),
+        Map.entry("356", "Banco Real"),
+        Map.entry("389", "Banco Mercantil do Brasil"),
+        Map.entry("399", "HSBC Bank Brasil"),
+        Map.entry("422", "Banco Safra"),
+        Map.entry("453", "Banco Rural"),
+        Map.entry("633", "Banco Rendimento"),
+        Map.entry("652", "Itaú Unibanco Holding"),
+        Map.entry("745", "Banco Citibank"),
+        
+        // Bancos Digitais e Fintechs
+        Map.entry("077", "Banco Inter"),
+        Map.entry("212", "Banco Original"),
+        Map.entry("260", "Nubank"),
+        Map.entry("290", "PagSeguro"),
+        Map.entry("323", "Mercado Pago"),
+        Map.entry("332", "Acesso Soluções de Pagamento"),
+        Map.entry("637", "Banco Sofisa"),
+        Map.entry("653", "Banco Voiter"),
+        Map.entry("655", "Banco Votorantim"),
+        Map.entry("735", "Banco Neon"),
+        Map.entry("085", "Cooperativa Central Ailos"),
+        Map.entry("197", "Stone Pagamentos"),
+        
+        // Corretoras e Investimentos
+        Map.entry("102", "XP Investimentos"),
+        Map.entry("120", "Banco Rodobens"),
+        Map.entry("184", "Banco Itaú BBA"),
+        Map.entry("746", "Banco Modal"),
+        
+        // Cooperativas
+        Map.entry("748", "Sicredi"),
+        Map.entry("756", "Sicoob")
+    );
+    return bancos.getOrDefault(codigoBanco, "Banco desconhecido");
+}
 
     private double extrairValor(String linha) {
         String valorStr = linha.substring(linha.length() - 10);
