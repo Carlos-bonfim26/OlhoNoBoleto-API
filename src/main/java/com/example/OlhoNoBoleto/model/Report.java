@@ -4,8 +4,12 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+import com.example.OlhoNoBoleto.enums.ReportStatus;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -41,5 +45,8 @@ public class Report implements Serializable {
     private String descricao;
     @Column(nullable = false)
     private LocalDateTime dataReport;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private ReportStatus status = ReportStatus.PENDENTE;  // Campo adicionado com padrão PENDENTE
 
 }

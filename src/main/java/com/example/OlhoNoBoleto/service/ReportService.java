@@ -1,12 +1,15 @@
 package com.example.OlhoNoBoleto.service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
 import com.example.OlhoNoBoleto.dto.report.ReportRequest;
 import com.example.OlhoNoBoleto.dto.report.ReportResponseDTO;
+import com.example.OlhoNoBoleto.enums.ReportStatus;
 import com.example.OlhoNoBoleto.model.Beneficiario;
 import com.example.OlhoNoBoleto.model.Boleto;
 import com.example.OlhoNoBoleto.model.Report;
@@ -47,6 +50,7 @@ public class ReportService {
                 report.setBeneficiario(beneficiario);
                 report.setDescricao(request.getDescricaoProblema());
                 report.setDataReport(LocalDateTime.now());
+                report.setStatus(ReportStatus.PENDENTE);  // Definir status padrão
 
                 reportRepository.save(report);
 
@@ -57,7 +61,8 @@ public class ReportService {
                                 report.getBoleto().getId(),
                                 report.getBeneficiario().getId(),
                                 report.getDescricao(),
-                                report.getDataReport());
+                                report.getDataReport(),
+                                report.getStatus());  // Incluir status na resposta
 
         }
 
@@ -74,7 +79,41 @@ public class ReportService {
                                 report.getBoleto().getId(),
                                 report.getBeneficiario().getId(),
                                 report.getDescricao(),
-                                report.getDataReport());
+                                report.getDataReport(),
+                                report.getStatus());  // Incluir status na resposta
+        }
+
+        // Novo método para listar todos os reports (para admin)
+        public List<ReportResponseDTO> listarTodosReports() {
+                List<Report> reports = reportRepository.findAll();
+                return reports.stream()
+                        .map(report -> new ReportResponseDTO(
+                                report.getId(),
+                                report.getUsuario().getNome(),
+                                report.getBoleto().getId(),
+                                report.getBeneficiario().getId(),
+                                report.getDescricao(),
+                                report.getDataReport(),
+                                report.getStatus()))
+                        .collect(Collectors.toList());
+        }
+
+        // Novo método para atualizar status do report
+        public ReportResponseDTO atualizarStatus(UUID id, ReportStatus novoStatus) {
+                Report report = reportRepository.findById(id)
+                                .orElseThrow(() -> new EntityNotFoundException("Report não encontrado"));
+
+                report.setStatus(novoStatus);
+                reportRepository.save(report);
+
+                return new ReportResponseDTO(
+                                report.getId(),
+                                report.getUsuario().getNome(),
+                                report.getBoleto().getId(),
+                                report.getBeneficiario().getId(),
+                                report.getDescricao(),
+                                report.getDataReport(),
+                                report.getStatus());
         }
 
 }

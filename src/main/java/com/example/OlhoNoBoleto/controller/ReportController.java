@@ -1,9 +1,11 @@
 package com.example.OlhoNoBoleto.controller;
 
+import java.util.List;
 import java.util.UUID;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -14,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.OlhoNoBoleto.dto.report.ReportRequest;
 import com.example.OlhoNoBoleto.dto.report.ReportResponseDTO;
+import com.example.OlhoNoBoleto.enums.ReportStatus;
 import com.example.OlhoNoBoleto.repository.ReportRepository;
 import com.example.OlhoNoBoleto.service.ReportService;
 
@@ -44,6 +47,21 @@ public class ReportController {
         public ResponseEntity<ReportResponseDTO> atualizarDescricao(@PathVariable UUID id,
                         @RequestBody String novaDescricao) {
                 ReportResponseDTO atualizado = reportService.atualizarDescricao(id, novaDescricao);
+                return ResponseEntity.ok(atualizado);
+        }
+              // Novo endpoint GET /reports para admin listar todos os reports
+        @GetMapping("/admin/reports")
+        @PreAuthorize("hasRole('ADMIN')")
+        public ResponseEntity<List<ReportResponseDTO>> listarTodosReports() {
+                List<ReportResponseDTO> reports = reportService.listarTodosReports();
+                return ResponseEntity.ok(reports);
+        }
+
+        // Novo endpoint PUT para atualizar status do report (para admin)
+        @PutMapping("/admin/{id}/status")
+        @PreAuthorize("hasRole('ADMIN')")
+        public ResponseEntity<ReportResponseDTO> atualizarStatus(@PathVariable UUID id, @RequestBody ReportStatus novoStatus) {
+                ReportResponseDTO atualizado = reportService.atualizarStatus(id, novoStatus);
                 return ResponseEntity.ok(atualizado);
         }
 
