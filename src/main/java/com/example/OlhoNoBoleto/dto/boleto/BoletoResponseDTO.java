@@ -21,4 +21,5 @@ public class BoletoResponseDTO {
     private String mensagem;
     private String motivo;
     private String recomendacao;
+    private String documentBeneficiario;
 }

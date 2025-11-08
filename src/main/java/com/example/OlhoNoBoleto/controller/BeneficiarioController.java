@@ -34,6 +34,7 @@ public class BeneficiarioController {
         return ResponseEntity.ok(beneficiarios);
     }
 
+
     @GetMapping("/beneficiarios")
     public ResponseEntity<?> mostrarBeneficiarios() {
         var allBeneficiarios = beneficiarioRepository.findAll();
