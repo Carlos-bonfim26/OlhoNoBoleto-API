@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 public class BeneficiarioResponseDTO {
     private UUID id;
     private String nome;
-    private String cnpjCpf;
+    private String  document;
     private String banco;
     private String agencia;
     private Integer totalQueixas;

@@ -28,7 +28,7 @@ public class Beneficiario implements Serializable{
     @Column(nullable = false)
     private String nome;
     @Column(nullable = false, unique = true)
-    private String cnpjCpf;
+    private String document;
     @Column(nullable = false)
     private String banco;
     @Column(nullable = false)

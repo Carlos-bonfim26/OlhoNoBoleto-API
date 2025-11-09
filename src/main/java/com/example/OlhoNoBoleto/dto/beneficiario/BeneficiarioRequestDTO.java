@@ -14,7 +14,7 @@ import lombok.Setter;
 public class BeneficiarioRequestDTO {
     private UUID beneficiarioId;
     private String nome;
-    private String cnpjCpf;
+    private String document;
     private String banco;
     private String agencia;
     private Integer totalQueixas;

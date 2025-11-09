@@ -38,3 +38,5 @@ maven-wrapper.properties
 ### Windows ###
 mvnw.cmd
 mvnw
+#.env
+.env
