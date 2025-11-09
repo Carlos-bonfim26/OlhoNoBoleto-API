@@ -33,7 +33,7 @@ public class BeneficiarioController {
         List<Beneficiario> beneficiarios = beneficiarioService.buscarPorCnpjCpf(document);
         return ResponseEntity.ok(beneficiarios);
     }
-
+    
 
     @GetMapping("/beneficiarios")
     public ResponseEntity<?> mostrarBeneficiarios() {

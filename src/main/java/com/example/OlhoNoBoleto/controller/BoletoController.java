@@ -36,12 +36,13 @@ public class BoletoController {
     @Autowired
     private BoletoService boletoService;
 
+    
    @PostMapping("/validate")
     public ResponseEntity<BoletoResponseDTO> validar(@RequestBody @Valid BoletoValidateRequestDTO request) {
         BoletoResponseDTO response = boletoService.validarBoleto(request);
         return ResponseEntity.ok(response);
     }
-    
+
     @GetMapping("/boletos")
     public ResponseEntity<?> mostrarBoletos() {
         var allBoletos = boletoRepository.findAll();
