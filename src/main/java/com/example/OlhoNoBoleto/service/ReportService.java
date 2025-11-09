@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import com.example.OlhoNoBoleto.dto.report.ReportRequest;
 import com.example.OlhoNoBoleto.dto.report.ReportResponseDTO;
+import com.example.OlhoNoBoleto.enums.ReportSeverity;
 import com.example.OlhoNoBoleto.enums.ReportStatus;
 import com.example.OlhoNoBoleto.model.Beneficiario;
 import com.example.OlhoNoBoleto.model.Boleto;
@@ -33,6 +34,17 @@ public class ReportService {
         private final BeneficiarioRepository beneficiarioRepository;
 
         public ReportResponseDTO criarReport(ReportRequest request) {
+                if (reportRepository.existsByUsuarioIdAndBoletoId(
+                                request.getUsuarioId(), request.getBoletoId())) {
+                        throw new IllegalArgumentException("Você já reportou este boleto anteriormente.");
+                }
+
+                // VALIDAR limite de reports por usuário (ex: 5 reports pendentes)
+                long reportsPendentes = reportRepository.countByUsuarioIdAndStatus(
+                                request.getUsuarioId(), ReportStatus.PENDENTE);
+                if (reportsPendentes >= 5) {
+                        throw new IllegalArgumentException("Você atingiu o limite de reports pendentes.");
+                }
                 // Buscar as entidades associadas
                 User usuario = usuarioRepository.findById(request.getUsuarioId())
                                 .orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado"));
@@ -43,27 +55,61 @@ public class ReportService {
                 Beneficiario beneficiario = beneficiarioRepository.findById(request.getBeneficiarioId())
                                 .orElseThrow(() -> new EntityNotFoundException("Beneficiário não encontrado"));
 
-                // Criar o report
+
+                // Criar report
                 Report report = new Report();
                 report.setUsuario(usuario);
                 report.setBoleto(boleto);
                 report.setBeneficiario(beneficiario);
-                report.setDescricao(request.getDescricaoProblema());
+                report.setTitulo(request.getTitulo());
+                report.setDescricao(request.getDescricao());
+                report.setCategoria(request.getCategoria());
+                report.setSeveridade(ReportSeverity.MEDIA); // Padrão
                 report.setDataReport(LocalDateTime.now());
-                report.setStatus(ReportStatus.PENDENTE);  // Definir status padrão
+                report.setStatus(ReportStatus.PENDENTE);
 
                 reportRepository.save(report);
 
-                // Retornar DTO de resposta
-                return new ReportResponseDTO(
-                                report.getId(),
-                                report.getUsuario().getNome(),
-                                report.getBoleto().getId(),
-                                report.getBeneficiario().getId(),
-                                report.getDescricao(),
-                                report.getDataReport(),
-                                report.getStatus());  // Incluir status na resposta
+                // ATUALIZAR CONTADOR DO BENEFICIÁRIO
+                atualizarContadorDenuncias(beneficiario);
 
+                return ReportResponseDTO.fromEntity(report);
+
+        }
+
+        private void atualizarContadorDenuncias(Beneficiario beneficiario) {
+                int totalReports = reportRepository.countByBeneficiarioAndStatus(
+                                beneficiario, ReportStatus.VALIDADO);
+                beneficiario.setTotalQueixas(totalReports);
+                beneficiarioRepository.save(beneficiario);
+        }
+
+        public List<ReportResponseDTO> listarTodosReports() {
+                List<Report> reports = reportRepository.findAll();
+                return reports.stream()
+                                .map(ReportResponseDTO::fromEntity) // ✅ Mais limpo!
+                                .collect(Collectors.toList());
+        }
+
+        public ReportResponseDTO atualizarStatus(UUID id, ReportStatus novoStatus) {
+                Report report = reportRepository.findById(id)
+                                .orElseThrow(() -> new EntityNotFoundException("Report não encontrado"));
+
+                ReportStatus statusAnterior = report.getStatus();
+                report.setStatus(novoStatus);
+
+                // Lógica de atualização de contador
+                if (novoStatus == ReportStatus.VALIDADO && statusAnterior != ReportStatus.VALIDADO) {
+                        atualizarContadorDenuncias(report.getBeneficiario());
+                }
+
+                if (novoStatus == ReportStatus.VALIDADO || novoStatus == ReportStatus.REJEITADO) {
+                        report.setDataResolucao(LocalDateTime.now());
+                }
+
+                reportRepository.save(report);
+
+                return ReportResponseDTO.fromEntity(report); // ✅ Mais limpo!
         }
 
         public ReportResponseDTO atualizarDescricao(UUID id, String novaDescricao) {
@@ -73,47 +119,6 @@ public class ReportService {
                 report.setDescricao(novaDescricao);
                 reportRepository.save(report);
 
-                return new ReportResponseDTO(
-                                report.getId(),
-                                report.getUsuario().getNome(),
-                                report.getBoleto().getId(),
-                                report.getBeneficiario().getId(),
-                                report.getDescricao(),
-                                report.getDataReport(),
-                                report.getStatus());  // Incluir status na resposta
+                return ReportResponseDTO.fromEntity(report); // ✅ Usando fromEntity
         }
-
-        // Novo método para listar todos os reports (para admin)
-        public List<ReportResponseDTO> listarTodosReports() {
-                List<Report> reports = reportRepository.findAll();
-                return reports.stream()
-                        .map(report -> new ReportResponseDTO(
-                                report.getId(),
-                                report.getUsuario().getNome(),
-                                report.getBoleto().getId(),
-                                report.getBeneficiario().getId(),
-                                report.getDescricao(),
-                                report.getDataReport(),
-                                report.getStatus()))
-                        .collect(Collectors.toList());
-        }
-
-        // Novo método para atualizar status do report
-        public ReportResponseDTO atualizarStatus(UUID id, ReportStatus novoStatus) {
-                Report report = reportRepository.findById(id)
-                                .orElseThrow(() -> new EntityNotFoundException("Report não encontrado"));
-
-                report.setStatus(novoStatus);
-                reportRepository.save(report);
-
-                return new ReportResponseDTO(
-                                report.getId(),
-                                report.getUsuario().getNome(),
-                                report.getBoleto().getId(),
-                                report.getBeneficiario().getId(),
-                                report.getDescricao(),
-                                report.getDataReport(),
-                                report.getStatus());
-        }
-
 }

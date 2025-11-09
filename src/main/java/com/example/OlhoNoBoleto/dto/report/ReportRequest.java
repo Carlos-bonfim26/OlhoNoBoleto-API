@@ -14,15 +14,18 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ReportRequest {
+  //Joaquim, bota os @NotNull onde for necessario
   private UUID id;
-  @NotNull
-  private UUID usuarioId;
-  private String nomeUsuario;
-  @NotNull
+  private String usuarioNome;
   private UUID boletoId;
-  @NotNull
   private UUID beneficiarioId;
-  @NotNull
-  private String descricaoProblema;
+  private String beneficiarioNome; // ✅ Adicionar
+  private String titulo;
+  private String descricao;
+  private String categoria;
+  private String severidade;
   private LocalDateTime dataReport;
+  private String status;
+  private String linhaDigitavel; // ✅ Para facilitar
+
 }
