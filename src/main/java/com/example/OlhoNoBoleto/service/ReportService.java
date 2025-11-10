@@ -103,7 +103,7 @@ public class ReportService {
                         atualizarContadorDenuncias(report.getBeneficiario());
                 }
 
-                if (novoStatus == ReportStatus.VALIDADO || novoStatus == ReportStatus.REJEITADO) {
+                if (novoStatus == ReportStatus.VALIDADO || novoStatus == ReportStatus.FALSO) {
                         report.setDataResolucao(LocalDateTime.now());
                 }
 

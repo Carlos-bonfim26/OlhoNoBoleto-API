@@ -17,6 +17,7 @@ public class ReportRequest {
   //Joaquim, bota os @NotNull onde for necessario
   private UUID id;
   private String usuarioNome;
+  private UUID usuarioId;
   private UUID boletoId;
   private UUID beneficiarioId;
   private String beneficiarioNome; // ✅ Adicionar
