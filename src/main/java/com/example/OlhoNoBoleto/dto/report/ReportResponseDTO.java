@@ -3,7 +3,6 @@ package com.example.OlhoNoBoleto.dto.report;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-import com.example.OlhoNoBoleto.enums.ReportStatus;
 import com.example.OlhoNoBoleto.model.Report;
 
 import lombok.AllArgsConstructor;

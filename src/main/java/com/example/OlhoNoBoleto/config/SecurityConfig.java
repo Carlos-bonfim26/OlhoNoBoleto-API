@@ -18,7 +18,7 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/cadastro", "/auth/login").permitAll()
+                        .requestMatchers("/auth/cadastro", "/auth/login", "/swagger-ui/index.html#/").permitAll()
                         .requestMatchers(HttpMethod.GET, "/auth/usuarios/**").hasRole("ADMIN")
                         .anyRequest().authenticated())
                 .httpBasic();
