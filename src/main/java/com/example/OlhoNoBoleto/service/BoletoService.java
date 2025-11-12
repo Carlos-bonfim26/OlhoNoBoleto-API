@@ -15,6 +15,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Service;
 import com.example.OlhoNoBoleto.dto.boleto.BoletoResponseDTO;
 import com.example.OlhoNoBoleto.dto.boleto.BoletoValidateRequestDTO;
+import com.example.OlhoNoBoleto.exceptions.BusinessException;
 import com.example.OlhoNoBoleto.model.Beneficiario;
 import com.example.OlhoNoBoleto.repository.ReportRepository;
 
@@ -188,81 +189,84 @@ public class BoletoService {
         if (linha.length() != 47 && linha.length() != 48) {
             throw new IllegalArgumentException("Linha digitável inválida: deve conter 47 ou 48 dígitos.");
         }
+        try {
+            // Extrai informações básicas
+            String codigoBanco = linha.substring(0, 3);
+            String nomeBanco = obterNomeBanco(codigoBanco);
+            double valor = extrairValor(linha);
+            String documentBeneficiario = extrairDocumentDoBeneficiario(linha);
+            String agenciaBeneficiario = extrairAgenciaBeneficiario(linha);
+            String nomeRealBeneficiario = obterNomeRealBeneficiario(documentBeneficiario, nomeBanco);
+            // Busca ou cria beneficiário
+            Beneficiario beneficiario = beneficiarioService.buscarOuCriarBeneficiario(
+                    documentBeneficiario,
+                    nomeRealBeneficiario,
+                    nomeBanco,
+                    agenciaBeneficiario).orElse(null);
 
-        // Extrai informações básicas
-        String codigoBanco = linha.substring(0, 3);
-        String nomeBanco = obterNomeBanco(codigoBanco);
-        double valor = extrairValor(linha);
-        String documentBeneficiario = extrairDocumentDoBeneficiario(linha);
-        String agenciaBeneficiario = extrairAgenciaBeneficiario(linha);
-        String nomeRealBeneficiario = obterNomeRealBeneficiario(documentBeneficiario, nomeBanco);
-        // Busca ou cria beneficiário
-        Beneficiario beneficiario = beneficiarioService.buscarOuCriarBeneficiario(
-                documentBeneficiario,
-                nomeRealBeneficiario,
-                nomeBanco,
-                agenciaBeneficiario).orElse(null);
+            // Verificações de segurança
+            int qtdDenuncias = 0;
+            boolean documentValido = false;
+            boolean documentCompativel = false;
+            boolean compECompativel = false;
 
-        // Verificações de segurança
-        int qtdDenuncias = 0;
-        boolean documentValido = false;
-        boolean documentCompativel = false;
-        boolean compECompativel = false;
+            if (beneficiario != null) {
+                qtdDenuncias = reportRepository.countByBeneficiario(beneficiario);
 
-        if (beneficiario != null) {
-            qtdDenuncias = reportRepository.countByBeneficiario(beneficiario);
+                // Verificar document com API do Banco Central
+                documentValido = verificarDocumentNoBancoCentral(documentBeneficiario);
 
-            // Verificar document com API do Banco Central
-            documentValido = verificarDocumentNoBancoCentral(documentBeneficiario);
+                // Verificar se document é compatível com nome (simulação)
+                documentCompativel = verificarCompatibilidadeDocumentNome(documentBeneficiario, beneficiario.getNome());
 
-            // Verificar se document é compatível com nome (simulação)
-            documentCompativel = verificarCompatibilidadeDocumentNome(documentBeneficiario, beneficiario.getNome());
+                // Verificar compatibilidade COMPE com conta
+                compECompativel = verificarCompatibilidadeCOMPE(codigoBanco, documentBeneficiario);
+            }
 
-            // Verificar compatibilidade COMPE com conta
-            compECompativel = verificarCompatibilidadeCOMPE(codigoBanco, documentBeneficiario);
+            // Define status e recomendação baseado nas verificações
+            String status = "válido";
+            String recomendacao = "PAGAR";
+            String motivo = null;
+
+            if (nomeBanco.equals("Banco desconhecido")) {
+                status = "suspeito";
+                recomendacao = "NÃO PAGAR";
+                motivo = "Banco não reconhecido.";
+            } else if (qtdDenuncias > 0) {
+                status = "suspeito";
+                recomendacao = "NÃO PAGAR";
+                motivo = "Beneficiário com " + qtdDenuncias + " denúncia(s) registrada(s).";
+            } else if (!documentValido) {
+                status = "suspeito";
+                recomendacao = "NÃO PAGAR";
+                motivo = "Documento do beneficiário inválido segundo Banco Central.";
+            } else if (!documentCompativel) {
+                status = "suspeito";
+                recomendacao = "NÃO PAGAR";
+                motivo = "Incompatibilidade entre documento e nome do beneficiário.";
+            } else if (!compECompativel) {
+                status = "suspeito";
+                recomendacao = "NÃO PAGAR";
+                motivo = "Incompatibilidade entre código do banco e conta do beneficiário.";
+            }
+
+            // Monta a resposta final
+            BoletoResponseDTO response = new BoletoResponseDTO();
+            response.setLinhaDigitavel(linha);
+            response.setBanco(nomeBanco);
+            response.setBeneficiarioNome(beneficiario != null ? beneficiario.getNome() : "Instituição bancária");
+            response.setValor(valor);
+            response.setDataValidacao(LocalDateTime.now());
+            response.setStatusValidacao(status);
+            response.setMensagem("Boleto processado com sucesso.");
+            response.setMotivo(motivo);
+            response.setRecomendacao(recomendacao);
+            response.setDocumentBeneficiario(documentBeneficiario);
+
+            return response;
+        } catch (IllegalArgumentException e) {
+            throw new BusinessException("Erro na validação do boleto: " + e.getMessage());
         }
-
-        // Define status e recomendação baseado nas verificações
-        String status = "válido";
-        String recomendacao = "PAGAR";
-        String motivo = null;
-
-        if (nomeBanco.equals("Banco desconhecido")) {
-            status = "suspeito";
-            recomendacao = "NÃO PAGAR";
-            motivo = "Banco não reconhecido.";
-        } else if (qtdDenuncias > 0) {
-            status = "suspeito";
-            recomendacao = "NÃO PAGAR";
-            motivo = "Beneficiário com " + qtdDenuncias + " denúncia(s) registrada(s).";
-        } else if (!documentValido) {
-            status = "suspeito";
-            recomendacao = "NÃO PAGAR";
-            motivo = "Documento do beneficiário inválido segundo Banco Central.";
-        } else if (!documentCompativel) {
-            status = "suspeito";
-            recomendacao = "NÃO PAGAR";
-            motivo = "Incompatibilidade entre documento e nome do beneficiário.";
-        } else if (!compECompativel) {
-            status = "suspeito";
-            recomendacao = "NÃO PAGAR";
-            motivo = "Incompatibilidade entre código do banco e conta do beneficiário.";
-        }
-
-        // Monta a resposta final
-        BoletoResponseDTO response = new BoletoResponseDTO();
-        response.setLinhaDigitavel(linha);
-        response.setBanco(nomeBanco);
-        response.setBeneficiarioNome(beneficiario != null ? beneficiario.getNome() : "Instituição bancária");
-        response.setValor(valor);
-        response.setDataValidacao(LocalDateTime.now());
-        response.setStatusValidacao(status);
-        response.setMensagem("Boleto processado com sucesso.");
-        response.setMotivo(motivo);
-        response.setRecomendacao(recomendacao);
-        response.setDocumentBeneficiario(documentBeneficiario);
-
-        return response;
     }
 
     public boolean verificarDocumentNoBancoCentral(String document) {

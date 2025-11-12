@@ -6,11 +6,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.example.OlhoNoBoleto.dto.user.UserRequestDTO;
 import com.example.OlhoNoBoleto.dto.user.UserResponseDTO;
+import com.example.OlhoNoBoleto.exceptions.BusinessException;
 import com.example.OlhoNoBoleto.model.User;
 import com.example.OlhoNoBoleto.repository.UsuarioRepository;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
 @Service
 public class AuthService {
 
@@ -31,6 +33,18 @@ public class AuthService {
     public UserResponseDTO atualizarUsuario(UUID id, UserRequestDTO usuario) {
         User user = usuarioRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+
+        if (usuario.getEmail() != null) {
+            boolean emailExists = usuarioRepository.findByEmail(usuario.getEmail())
+                    .filter(u -> !u.getId().equals(id))
+                    .isPresent();
+
+            if (emailExists) {
+                throw new BusinessException("Email já está em uso por outro usuário", "EMAIL_ALREADY_EXISTS");
+            }
+        }
+
+        // ✅ MOVER AS ATUALIZAÇÕES PARA FORA DO IF
         user.setNome(usuario.getNome());
         user.setEmail(usuario.getEmail());
 

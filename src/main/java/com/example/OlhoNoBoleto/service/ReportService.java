@@ -11,6 +11,7 @@ import com.example.OlhoNoBoleto.dto.report.ReportRequest;
 import com.example.OlhoNoBoleto.dto.report.ReportResponseDTO;
 import com.example.OlhoNoBoleto.enums.ReportSeverity;
 import com.example.OlhoNoBoleto.enums.ReportStatus;
+import com.example.OlhoNoBoleto.exceptions.BusinessException;
 import com.example.OlhoNoBoleto.model.Beneficiario;
 import com.example.OlhoNoBoleto.model.Boleto;
 import com.example.OlhoNoBoleto.model.Report;
@@ -45,6 +46,9 @@ public class ReportService {
                 if (reportsPendentes >= 5) {
                         throw new IllegalArgumentException("Você atingiu o limite de reports pendentes.");
                 }
+                if (reportRepository.existsByUsuarioIdAndBoletoId(request.getUsuarioId(), request.getBoletoId())) {
+                        throw new BusinessException("Você já reportou este boleto anteriormente", "DUPLICATE_REPORT");
+                }
                 // Buscar as entidades associadas
                 User usuario = usuarioRepository.findById(request.getUsuarioId())
                                 .orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado"));
@@ -54,7 +58,6 @@ public class ReportService {
 
                 Beneficiario beneficiario = beneficiarioRepository.findById(request.getBeneficiarioId())
                                 .orElseThrow(() -> new EntityNotFoundException("Beneficiário não encontrado"));
-
 
                 // Criar report
                 Report report = new Report();
