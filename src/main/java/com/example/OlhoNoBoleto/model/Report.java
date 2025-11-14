@@ -49,16 +49,15 @@ public class Report implements Serializable {
     private LocalDateTime dataReport;
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private ReportStatus status = ReportStatus.PENDENTE; // Campo adicionado com padrão PENDENTE
+    private ReportStatus status = ReportStatus.PENDENTE;
     @Column(nullable = false)
-    private String titulo; // Resumo do problema
+    private String titulo;
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private ReportSeverity severidade = ReportSeverity.MEDIA; // BAIXA, MEDIA, ALTA, CRITICA
+    private ReportSeverity severidade = ReportSeverity.MEDIA;
     @Column
-    private String categoria; // "Golpe", "Cobrança indevida", "Serviço não prestado", etc.
-    @Column
-    private LocalDateTime dataResolucao; // Quando o admin resolver
+    private String categoria;
+    private LocalDateTime dataResolucao;
     @Column(length = 1000)
-    private String observacaoAdmin; // Comentário do admin
+    private String observacaoAdmin;
 }

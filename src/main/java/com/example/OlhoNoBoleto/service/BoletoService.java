@@ -28,7 +28,6 @@ public class BoletoService {
     @Autowired
     private ReportRepository reportRepository;
     private static final Map<String, String> CODIGO_PARA_NOME_BANCO = Map.ofEntries(
-            // Bancos Tradicionais
             Map.entry("001", "Banco do Brasil"),
             Map.entry("033", "Santander"),
             Map.entry("104", "Caixa Econômica Federal"),
@@ -43,7 +42,6 @@ public class BoletoService {
             Map.entry("652", "Itaú Unibanco Holding"),
             Map.entry("745", "Banco Citibank"),
 
-            // Bancos Digitais e Fintechs
             Map.entry("077", "Banco Inter"),
             Map.entry("212", "Banco Original"),
             Map.entry("260", "Nubank"),
@@ -57,53 +55,48 @@ public class BoletoService {
             Map.entry("085", "Cooperativa Central Ailos"),
             Map.entry("197", "Stone Pagamentos"),
 
-            // Corretoras e Investimentos
             Map.entry("102", "XP Investimentos"),
             Map.entry("120", "Banco Rodobens"),
             Map.entry("184", "Banco Itaú BBA"),
             Map.entry("746", "Banco Modal"),
 
-            // Cooperativas
             Map.entry("748", "Sicredi"),
             Map.entry("756", "Sicoob"));
 
     private static final Map<String, String> BANCO_PARA_CNPJ = Map.ofEntries(
-            // Bancos Tradicionais
-            Map.entry("001", "00000000000191"), // Banco do Brasil
-            Map.entry("033", "60701190000104"), // Santander
-            Map.entry("104", "00360305000104"), // Caixa Econômica Federal
-            Map.entry("237", "60746948000112"), // Bradesco
-            Map.entry("341", "61532679000150"), // Itaú Unibanco
-            Map.entry("356", "06271464000135"), // Banco Real
-            Map.entry("389", "17184037000110"), // Banco Mercantil do Brasil
-            Map.entry("399", "04064547000187"), // HSBC Bank Brasil
-            Map.entry("422", "58141356000182"), // Banco Safra
-            Map.entry("453", "00416968000101"), // Banco Rural
-            Map.entry("633", "68900810000141"), // Banco Rendimento
-            Map.entry("652", "01522376000152"), // Itaú Unibanco Holding
-            Map.entry("745", "33479023000120"), // Banco Citibank
-            Map.entry("748", "33644115000190"), // Sicredi
-            Map.entry("756", "02038232000164"), // Sicoob
+            Map.entry("001", "00000000000191"),
+            Map.entry("033", "60701190000104"),
+            Map.entry("104", "00360305000104"),
+            Map.entry("237", "60746948000112"),
+            Map.entry("341", "61532679000150"),
+            Map.entry("356", "06271464000135"),
+            Map.entry("389", "17184037000110"),
+            Map.entry("399", "04064547000187"),
+            Map.entry("422", "58141356000182"),
+            Map.entry("453", "00416968000101"),
+            Map.entry("633", "68900810000141"),
+            Map.entry("652", "01522376000152"),
+            Map.entry("745", "33479023000120"),
+            Map.entry("748", "33644115000190"),
+            Map.entry("756", "02038232000164"),
 
-            // Bancos Digitais e Fintechs
-            Map.entry("077", "92875780000131"), // Banco Inter
-            Map.entry("212", "92894922000143"), // Banco Original
-            Map.entry("260", "09313766000194"), // Nubank
-            Map.entry("290", "08561701000109"), // PagSeguro
-            Map.entry("323", "01027058000191"), // Mercado Pago
-            Map.entry("332", "13140088000130"), // Acesso Soluções de Pagamento
-            Map.entry("637", "60889128000148"), // Banco Sofisa
-            Map.entry("653", "36498109000179"), // Banco Voiter
-            Map.entry("655", "62098988000186"), // Banco Votorantim
-            Map.entry("735", "03801695000106"), // Banco Neon
-            Map.entry("085", "05442055000126"), // Cooperativa Central Ailos
-            Map.entry("197", "24074692000191"), // Stone Pagamentos
+            Map.entry("077", "92875780000131"),
+            Map.entry("212", "92894922000143"),
+            Map.entry("260", "09313766000194"),
+            Map.entry("290", "08561701000109"),
+            Map.entry("323", "01027058000191"),
+            Map.entry("332", "13140088000130"),
+            Map.entry("637", "60889128000148"),
+            Map.entry("653", "36498109000179"),
+            Map.entry("655", "62098988000186"),
+            Map.entry("735", "03801695000106"),
+            Map.entry("085", "05442055000126"),
+            Map.entry("197", "24074692000191"),
 
-            // Corretoras e Investimentos
-            Map.entry("102", "02332886000104"), // XP Investimentos
-            Map.entry("120", "01634601000140"), // Banco Rodobens
-            Map.entry("184", "33657200000120"), // Banco Itaú BBA
-            Map.entry("746", "61532679000150") // Banco Modal
+            Map.entry("102", "02332886000104"),
+            Map.entry("120", "01634601000140"),
+            Map.entry("184", "33657200000120"),
+            Map.entry("746", "61532679000150")
     );
 
     private String obterNomeBanco(String codigoBanco) {
@@ -126,10 +119,8 @@ public class BoletoService {
 
     private boolean verificarCompatibilidadeCOMPE(String codigoBanco, String document) {
         try {
-            // Usando o mapeamento constante que já temos
             String cnpjEsperado = BANCO_PARA_CNPJ.get(codigoBanco);
 
-            // Se não temos mapeamento para este banco, considerar compatível
             if (cnpjEsperado == null) {
                 return true;
             }
@@ -151,7 +142,6 @@ public class BoletoService {
 
     private String obterNomeRealBeneficiario(String document, String nomeBanco) {
         try {
-            // Se é um banco conhecido, buscar nome da API
             if (BANCO_PARA_CNPJ.containsValue(document)) {
                 String url = "https://brasilapi.com.br/api/cnpj/v1/" + document;
 
@@ -165,7 +155,6 @@ public class BoletoService {
                     String razaoSocial = root.path("razao_social").asText("");
                     String nomeFantasia = root.path("nome_fantasia").asText("");
 
-                    // Preferir nome fantasia, depois razão social
                     if (!nomeFantasia.isEmpty()) {
                         return nomeFantasia;
                     } else if (!razaoSocial.isEmpty()) {
@@ -174,11 +163,9 @@ public class BoletoService {
                 }
             }
 
-            // Fallback: nome do banco + "S.A."
             return nomeBanco + " S.A.";
 
         } catch (Exception e) {
-            // Fallback em caso de erro
             return nomeBanco + " S.A.";
         }
     }
@@ -190,21 +177,18 @@ public class BoletoService {
             throw new IllegalArgumentException("Linha digitável inválida: deve conter 47 ou 48 dígitos.");
         }
         try {
-            // Extrai informações básicas
             String codigoBanco = linha.substring(0, 3);
             String nomeBanco = obterNomeBanco(codigoBanco);
             double valor = extrairValor(linha);
             String documentBeneficiario = extrairDocumentDoBeneficiario(linha);
             String agenciaBeneficiario = extrairAgenciaBeneficiario(linha);
             String nomeRealBeneficiario = obterNomeRealBeneficiario(documentBeneficiario, nomeBanco);
-            // Busca ou cria beneficiário
             Beneficiario beneficiario = beneficiarioService.buscarOuCriarBeneficiario(
                     documentBeneficiario,
                     nomeRealBeneficiario,
                     nomeBanco,
                     agenciaBeneficiario).orElse(null);
 
-            // Verificações de segurança
             int qtdDenuncias = 0;
             boolean documentValido = false;
             boolean documentCompativel = false;
@@ -213,17 +197,13 @@ public class BoletoService {
             if (beneficiario != null) {
                 qtdDenuncias = reportRepository.countByBeneficiario(beneficiario);
 
-                // Verificar document com API do Banco Central
                 documentValido = verificarDocumentNoBancoCentral(documentBeneficiario);
 
-                // Verificar se document é compatível com nome (simulação)
                 documentCompativel = verificarCompatibilidadeDocumentNome(documentBeneficiario, beneficiario.getNome());
 
-                // Verificar compatibilidade COMPE com conta
                 compECompativel = verificarCompatibilidadeCOMPE(codigoBanco, documentBeneficiario);
             }
 
-            // Define status e recomendação baseado nas verificações
             String status = "válido";
             String recomendacao = "PAGAR";
             String motivo = null;
@@ -250,7 +230,6 @@ public class BoletoService {
                 motivo = "Incompatibilidade entre código do banco e conta do beneficiário.";
             }
 
-            // Monta a resposta final
             BoletoResponseDTO response = new BoletoResponseDTO();
             response.setLinhaDigitavel(linha);
             response.setBanco(nomeBanco);
@@ -275,7 +254,6 @@ public class BoletoService {
                 return false;
             }
 
-            // Brasil API - Gratuita e mais estável
             String url = "https://brasilapi.com.br/api/cnpj/v1/" + document;
 
             RestTemplate restTemplate = createRestTemplateWithTimeout();
@@ -288,7 +266,7 @@ public class BoletoService {
             ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
 
             if (response.getStatusCode() == HttpStatus.NOT_FOUND) {
-                return false; // CNPJ não encontrado
+                return false;
             }
 
             if (response.getStatusCode() != HttpStatus.OK) {
@@ -312,9 +290,9 @@ public class BoletoService {
 
     private RestTemplate createRestTemplateWithTimeout() {
         HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory();
-        factory.setConnectTimeout(10000); // 10 segundos
+        factory.setConnectTimeout(10000);
         factory.setConnectionRequestTimeout(10000);
-        factory.setReadTimeout(30000); // 30 segundos para APIs lentas
+        factory.setReadTimeout(30000);
 
         return new RestTemplate(factory);
     }
@@ -324,14 +302,12 @@ public class BoletoService {
             ObjectMapper mapper = new ObjectMapper();
             JsonNode root = mapper.readTree(jsonResponse);
 
-            // Verificar situação
             String descricaoSituacao = root.path("descricao_situacao_cadastral").asText("");
             String situacao = root.path("situacao_cadastral").asText("");
 
             boolean isAtiva = "ATIVA".equalsIgnoreCase(descricaoSituacao) ||
-                    "02".equals(situacao); // Código 2 = Ativa
+                    "02".equals(situacao);
 
-            // Verificar dados básicos
             String razaoSocial = root.path("razao_social").asText("");
             boolean dadosValidos = !razaoSocial.isEmpty();
 
@@ -350,13 +326,11 @@ public class BoletoService {
 
         String codigoBanco = linha.substring(0, 3);
 
-        // Para a maioria dos bancos brasileiros, a agência está entre posições 19-23
-        // Isso é padrão na linha digitável de boletos
+
         if (BANCO_PARA_CNPJ.containsKey(codigoBanco)) {
-            return linha.substring(19, 23); // Posição padrão
+            return linha.substring(19, 23);
         }
 
-        // Fallback para posição genérica
         return linha.substring(3, 7);
     }
 
@@ -366,7 +340,6 @@ public class BoletoService {
                 return false;
             }
 
-            // Consultar Brasil API para pegar a razão social real
             String url = "https://brasilapi.com.br/api/cnpj/v1/" + document;
 
             RestTemplate restTemplate = createRestTemplateWithTimeout();
@@ -383,7 +356,6 @@ public class BoletoService {
             String nomeFantasiaReal = root.path("nome_fantasia").asText("").toLowerCase().trim();
             String nomeInformado = nomeBeneficiario.toLowerCase().trim();
 
-            // Verificar compatibilidade
             boolean compativel = razaoSocialReal.contains(nomeInformado) ||
                     nomeInformado.contains(razaoSocialReal) ||
                     (!nomeFantasiaReal.isEmpty() &&

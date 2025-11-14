@@ -40,7 +40,6 @@ public class ReportService {
                         throw new IllegalArgumentException("Você já reportou este boleto anteriormente.");
                 }
 
-                // VALIDAR limite de reports por usuário (ex: 5 reports pendentes)
                 long reportsPendentes = reportRepository.countByUsuarioIdAndStatus(
                                 request.getUsuarioId(), ReportStatus.PENDENTE);
                 if (reportsPendentes >= 5) {
@@ -49,7 +48,6 @@ public class ReportService {
                 if (reportRepository.existsByUsuarioIdAndBoletoId(request.getUsuarioId(), request.getBoletoId())) {
                         throw new BusinessException("Você já reportou este boleto anteriormente", "DUPLICATE_REPORT");
                 }
-                // Buscar as entidades associadas
                 User usuario = usuarioRepository.findById(request.getUsuarioId())
                                 .orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado"));
 
@@ -59,7 +57,6 @@ public class ReportService {
                 Beneficiario beneficiario = beneficiarioRepository.findById(request.getBeneficiarioId())
                                 .orElseThrow(() -> new EntityNotFoundException("Beneficiário não encontrado"));
 
-                // Criar report
                 Report report = new Report();
                 report.setUsuario(usuario);
                 report.setBoleto(boleto);
@@ -67,13 +64,12 @@ public class ReportService {
                 report.setTitulo(request.getTitulo());
                 report.setDescricao(request.getDescricao());
                 report.setCategoria(request.getCategoria());
-                report.setSeveridade(ReportSeverity.MEDIA); // Padrão
+                report.setSeveridade(ReportSeverity.MEDIA);
                 report.setDataReport(LocalDateTime.now());
                 report.setStatus(ReportStatus.PENDENTE);
 
                 reportRepository.save(report);
 
-                // ATUALIZAR CONTADOR DO BENEFICIÁRIO
                 atualizarContadorDenuncias(beneficiario);
 
                 return ReportResponseDTO.fromEntity(report);
@@ -90,7 +86,7 @@ public class ReportService {
         public List<ReportResponseDTO> listarTodosReports() {
                 List<Report> reports = reportRepository.findAll();
                 return reports.stream()
-                                .map(ReportResponseDTO::fromEntity) // ✅ Mais limpo!
+                                .map(ReportResponseDTO::fromEntity)
                                 .collect(Collectors.toList());
         }
 
@@ -101,7 +97,6 @@ public class ReportService {
                 ReportStatus statusAnterior = report.getStatus();
                 report.setStatus(novoStatus);
 
-                // Lógica de atualização de contador
                 if (novoStatus == ReportStatus.VALIDADO && statusAnterior != ReportStatus.VALIDADO) {
                         atualizarContadorDenuncias(report.getBeneficiario());
                 }
@@ -112,7 +107,7 @@ public class ReportService {
 
                 reportRepository.save(report);
 
-                return ReportResponseDTO.fromEntity(report); // ✅ Mais limpo!
+                return ReportResponseDTO.fromEntity(report);
         }
 
         public ReportResponseDTO atualizarDescricao(UUID id, String novaDescricao) {
@@ -122,6 +117,6 @@ public class ReportService {
                 report.setDescricao(novaDescricao);
                 reportRepository.save(report);
 
-                return ReportResponseDTO.fromEntity(report); // ✅ Usando fromEntity
+                return ReportResponseDTO.fromEntity(report);
         }
 }

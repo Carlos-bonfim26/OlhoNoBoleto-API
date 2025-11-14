@@ -19,7 +19,6 @@ import java.util.stream.Collectors;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    // Custom Exceptions
     @ExceptionHandler(CustomException.class)
     public ResponseEntity<ErrorResponse> handleCustomException(CustomException ex, HttpServletRequest request) {
         log.error("Custom Exception: {}", ex.getMessage(), ex);
@@ -34,7 +33,6 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(error, ex.getStatus());
     }
 
-    // Validation Errors (Bean Validation)
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponse> handleValidationException(
             MethodArgumentNotValidException ex, HttpServletRequest request) {
@@ -60,7 +58,6 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
     }
 
-    // External API Errors
     @ExceptionHandler(HttpClientErrorException.class)
     public ResponseEntity<ErrorResponse> handleHttpClientErrorException(
             HttpClientErrorException ex, HttpServletRequest request) {
@@ -76,7 +73,6 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(error, HttpStatus.SERVICE_UNAVAILABLE);
     }
 
-    // Timeout Errors
     @ExceptionHandler(ResourceAccessException.class)
     public ResponseEntity<ErrorResponse> handleTimeoutException(
             ResourceAccessException ex, HttpServletRequest request) {
@@ -92,7 +88,6 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(error, HttpStatus.REQUEST_TIMEOUT);
     }
 
-    // Generic Exception (Fallback)
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleGenericException(
             Exception ex, HttpServletRequest request) {

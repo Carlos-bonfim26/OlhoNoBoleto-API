@@ -51,14 +51,11 @@ class BeneficiarioServiceTest {
 
     @Test
     void buscarPorCnpjCpf_QuandoEncontraBeneficiarios_DeveRetornarLista() {
-        // Arrange
         List<Beneficiario> beneficiarios = Arrays.asList(beneficiarioExistente);
         when(beneficiarioRepository.findByDocument(document)).thenReturn(beneficiarios);
 
-        // Act
         List<Beneficiario> resultado = beneficiarioService.buscarPorCnpjCpf(document);
 
-        // Assert
         assertNotNull(resultado);
         assertEquals(1, resultado.size());
         assertEquals(beneficiarioExistente, resultado.get(0));
@@ -67,13 +64,10 @@ class BeneficiarioServiceTest {
 
     @Test
     void buscarPorCnpjCpf_QuandoNaoEncontraBeneficiarios_DeveRetornarListaVazia() {
-        // Arrange
         when(beneficiarioRepository.findByDocument(document)).thenReturn(Arrays.asList());
 
-        // Act
         List<Beneficiario> resultado = beneficiarioService.buscarPorCnpjCpf(document);
 
-        // Assert
         assertNotNull(resultado);
         assertTrue(resultado.isEmpty());
         verify(beneficiarioRepository).findByDocument(document);
@@ -81,35 +75,28 @@ class BeneficiarioServiceTest {
 
     @Test
     void buscarOuCriarBeneficiario_QuandoBeneficiarioExiste_DeveRetornarBeneficiarioExistente() {
-        // Arrange
         List<Beneficiario> beneficiarios = Arrays.asList(beneficiarioExistente);
         when(beneficiarioRepository.findByDocument(document)).thenReturn(beneficiarios);
 
-        // Act
         Optional<Beneficiario> resultado = beneficiarioService.buscarOuCriarBeneficiario(document, nome, banco, agencia);
 
-        // Assert
         assertTrue(resultado.isPresent());
         assertEquals(beneficiarioExistente, resultado.get());
-        // Verifica que NÃO foi chamado o save para criar novo beneficiário
         verify(beneficiarioRepository, never()).save(any(Beneficiario.class));
         verify(beneficiarioRepository).findByDocument(document);
     }
 
     @Test
     void buscarOuCriarBeneficiario_QuandoBeneficiarioNaoExiste_DeveCriarNovoBeneficiario() {
-        // Arrange
         when(beneficiarioRepository.findByDocument(document)).thenReturn(Arrays.asList());
         when(beneficiarioRepository.save(any(Beneficiario.class))).thenAnswer(invocation -> {
             Beneficiario beneficiarioSalvo = invocation.getArgument(0);
-            beneficiarioSalvo.setId(UUID.randomUUID()); // Simula a geração do ID
+            beneficiarioSalvo.setId(UUID.randomUUID());
             return beneficiarioSalvo;
         });
 
-        // Act
         Optional<Beneficiario> resultado = beneficiarioService.buscarOuCriarBeneficiario(document, nome, banco, agencia);
 
-        // Assert
         assertTrue(resultado.isPresent());
         Beneficiario novoBeneficiario = resultado.get();
         
@@ -125,7 +112,6 @@ class BeneficiarioServiceTest {
 
     @Test
     void buscarOuCriarBeneficiario_QuandoExistemMultiplosBeneficiariosComMesmoDocumento_DeveRetornarPrimeiro() {
-        // Arrange
         Beneficiario outroBeneficiario = new Beneficiario();
         outroBeneficiario.setId(UUID.randomUUID());
         outroBeneficiario.setDocument(document);
@@ -134,10 +120,8 @@ class BeneficiarioServiceTest {
         List<Beneficiario> multiplosBeneficiarios = Arrays.asList(beneficiarioExistente, outroBeneficiario);
         when(beneficiarioRepository.findByDocument(document)).thenReturn(multiplosBeneficiarios);
 
-        // Act
         Optional<Beneficiario> resultado = beneficiarioService.buscarOuCriarBeneficiario(document, nome, banco, agencia);
 
-        // Assert
         assertTrue(resultado.isPresent());
         assertEquals(beneficiarioExistente, resultado.get());
         verify(beneficiarioRepository, never()).save(any(Beneficiario.class));
@@ -145,18 +129,14 @@ class BeneficiarioServiceTest {
 
     @Test
     void buscarOuCriarBeneficiario_QuandoNaoExisteBeneficiario_DeveSalvarComDadosCorretos() {
-        // Arrange
         when(beneficiarioRepository.findByDocument(document)).thenReturn(Arrays.asList());
         when(beneficiarioRepository.save(any(Beneficiario.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        // Act
         Optional<Beneficiario> resultado = beneficiarioService.buscarOuCriarBeneficiario(document, nome, banco, agencia);
 
-        // Assert
         assertTrue(resultado.isPresent());
         Beneficiario novoBeneficiario = resultado.get();
         
-        // Verifica se todos os campos foram setados corretamente
         assertEquals(document, novoBeneficiario.getDocument());
         assertEquals(nome, novoBeneficiario.getNome());
         assertEquals(banco, novoBeneficiario.getBanco());
@@ -166,27 +146,21 @@ class BeneficiarioServiceTest {
 
     @Test
     void buscarOuCriarBeneficiario_QuandoNaoExisteBeneficiario_DeveChamarSaveApenasUmaVez() {
-        // Arrange
         when(beneficiarioRepository.findByDocument(document)).thenReturn(Arrays.asList());
         when(beneficiarioRepository.save(any(Beneficiario.class))).thenReturn(new Beneficiario());
 
-        // Act
         beneficiarioService.buscarOuCriarBeneficiario(document, nome, banco, agencia);
 
-        // Assert
         verify(beneficiarioRepository, times(1)).save(any(Beneficiario.class));
     }
 
     @Test
     void buscarOuCriarBeneficiario_QuandoExisteBeneficiario_NaoDeveChamarSave() {
-        // Arrange
         List<Beneficiario> beneficiarios = Arrays.asList(beneficiarioExistente);
         when(beneficiarioRepository.findByDocument(document)).thenReturn(beneficiarios);
 
-        // Act
         beneficiarioService.buscarOuCriarBeneficiario(document, nome, banco, agencia);
 
-        // Assert
         verify(beneficiarioRepository, never()).save(any(Beneficiario.class));
     }
 }

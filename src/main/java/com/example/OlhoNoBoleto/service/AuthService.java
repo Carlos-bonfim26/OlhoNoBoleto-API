@@ -43,8 +43,6 @@ public class AuthService {
                 throw new BusinessException("Email já está em uso por outro usuário", "EMAIL_ALREADY_EXISTS");
             }
         }
-
-        // ✅ MOVER AS ATUALIZAÇÕES PARA FORA DO IF
         user.setNome(usuario.getNome());
         user.setEmail(usuario.getEmail());
 

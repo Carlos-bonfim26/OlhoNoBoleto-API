@@ -23,7 +23,6 @@ public class BeneficiarioService {
         if (beneficiarioExistente.isPresent()) {
             return beneficiarioExistente;
         } else {
-            // Criar novo beneficiário
             Beneficiario novoBeneficiario = new Beneficiario();
             novoBeneficiario.setDocument(document);
             novoBeneficiario.setNome(nome);

@@ -18,7 +18,7 @@ import com.example.OlhoNoBoleto.dto.user.LoginRequestDTO;
 import com.example.OlhoNoBoleto.dto.user.UserRequestDTO;
 import com.example.OlhoNoBoleto.dto.user.UserResponseDTO;
 import com.example.OlhoNoBoleto.model.User;
-// import com.example.OlhoNoBoleto.service.AuthService;
+
 import com.example.OlhoNoBoleto.repository.UsuarioRepository;
 import com.example.OlhoNoBoleto.service.AuthService;
 
