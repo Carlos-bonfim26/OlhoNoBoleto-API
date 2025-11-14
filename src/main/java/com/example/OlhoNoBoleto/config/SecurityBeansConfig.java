@@ -26,8 +26,8 @@ public class SecurityBeansConfig {
 
             return org.springframework.security.core.userdetails.User.builder()
                     .username(user.getEmail())
-                    .password(user.getSenha()) // senha já criptografada
-                    .authorities(user.getRole().name()) // ROLE_ADMIN ou ROLE_USER
+                    .password(user.getSenha())
+                    .authorities(user.getRole().name())
                     .build();
         };
     }

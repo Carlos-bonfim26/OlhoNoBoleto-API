@@ -28,8 +28,6 @@ class BoletoServiceTest {
     @InjectMocks
     private BoletoService boletoService;
 
-    // LINHAS DIGITÁVEIS REAIS VÁLIDAS (47 caracteres EXATOS)
-    // Formatos válidos de boletos reais
     private static final String LINHA_BANCO_BRASIL = "00100000000000000000000000000000000000000002000";
     private static final String LINHA_ITAU = "34100000000000000000000000000000000000000020000";
     private static final String LINHA_BRADESCO = "23700000000000000000000000000000000000000020000";
@@ -38,7 +36,6 @@ class BoletoServiceTest {
 
     @Test
     void debugVerificarTamanhoLinhaDigitavel() {
-        // Teste de debug para verificar o problema
         String[] linhas = { LINHA_BANCO_BRASIL, LINHA_ITAU, LINHA_BRADESCO, LINHA_BANCO_DESCONHECIDO };
 
         for (String linha : linhas) {
@@ -51,7 +48,6 @@ class BoletoServiceTest {
 
     @Test
     void deveValidarBoletoComLinhaDigitavelValida() {
-        // Arrange
         BoletoValidateRequestDTO request = new BoletoValidateRequestDTO();
         request.setLinhaDigitavel(LINHA_BANCO_BRASIL);
 
@@ -63,26 +59,20 @@ class BoletoServiceTest {
                 .thenReturn(Optional.of(beneficiarioMock));
         when(reportRepository.countByBeneficiario(any(Beneficiario.class))).thenReturn(0);
 
-        // Act
         BoletoResponseDTO response = boletoService.validarBoleto(request);
 
-        // Assert - Foco no comportamento principal
         assertNotNull(response);
         assertEquals(LINHA_BANCO_BRASIL, response.getLinhaDigitavel());
         assertEquals("Banco do Brasil", response.getBanco());
         assertNotNull(response.getDataValidacao());
 
-        // O status pode variar baseado em verificações externas
-        // Então não validamos rigidamente "válido" vs "suspeito"
     }
 
     @Test
     void deveLancarExcecaoParaLinhaDigitavelComTamanhoInvalido() {
-        // Arrange
         BoletoValidateRequestDTO request = new BoletoValidateRequestDTO();
-        request.setLinhaDigitavel("12345"); // Tamanho inválido
+        request.setLinhaDigitavel("12345");
 
-        // Act & Assert
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
             boletoService.validarBoleto(request);
         });
@@ -92,7 +82,6 @@ class BoletoServiceTest {
 
     @Test
     void deveMarcarBoletoComoSuspeitoParaBancoDesconhecido() {
-        // Arrange
         BoletoValidateRequestDTO request = new BoletoValidateRequestDTO();
         request.setLinhaDigitavel(LINHA_BANCO_DESCONHECIDO);
 
@@ -104,10 +93,8 @@ class BoletoServiceTest {
                 .thenReturn(Optional.of(beneficiarioMock));
         when(reportRepository.countByBeneficiario(any(Beneficiario.class))).thenReturn(0);
 
-        // Act
         BoletoResponseDTO response = boletoService.validarBoleto(request);
 
-        // Assert
         assertEquals("suspeito", response.getStatusValidacao());
         assertEquals("NÃO PAGAR", response.getRecomendacao());
         assertEquals("Banco desconhecido", response.getBanco());
@@ -116,7 +103,6 @@ class BoletoServiceTest {
 
     @Test
     void deveMarcarBoletoComoSuspeitoParaBeneficiarioComDenuncias() {
-        // Arrange
         BoletoValidateRequestDTO request = new BoletoValidateRequestDTO();
         request.setLinhaDigitavel(LINHA_BANCO_BRASIL);
 
@@ -126,12 +112,10 @@ class BoletoServiceTest {
 
         when(beneficiarioService.buscarOuCriarBeneficiario(anyString(), anyString(), anyString(), anyString()))
                 .thenReturn(Optional.of(beneficiarioMock));
-        when(reportRepository.countByBeneficiario(any(Beneficiario.class))).thenReturn(3); // 3 denúncias
+        when(reportRepository.countByBeneficiario(any(Beneficiario.class))).thenReturn(3);
 
-        // Act
         BoletoResponseDTO response = boletoService.validarBoleto(request);
 
-        // Assert
         assertEquals("suspeito", response.getStatusValidacao());
         assertEquals("NÃO PAGAR", response.getRecomendacao());
         assertTrue(response.getMotivo().contains("denúncia"));
@@ -139,7 +123,6 @@ class BoletoServiceTest {
 
     @Test
     void deveExtrairValorCorretamenteDaLinhaDigitavel() {
-        // Arrange
         BoletoValidateRequestDTO request = new BoletoValidateRequestDTO();
         request.setLinhaDigitavel(LINHA_COM_VALOR);
 
@@ -151,16 +134,13 @@ class BoletoServiceTest {
                 .thenReturn(Optional.of(beneficiarioMock));
         when(reportRepository.countByBeneficiario(any(Beneficiario.class))).thenReturn(0);
 
-        // Act
         BoletoResponseDTO response = boletoService.validarBoleto(request);
 
-        // Assert
-        assertEquals(20.00, response.getValor()); // 2000 / 100 = 20.00
+        assertEquals(20.00, response.getValor());
     }
 
     @Test
     void deveExtrairCodigoBancoCorretamente() {
-        // Arrange
         BoletoValidateRequestDTO request = new BoletoValidateRequestDTO();
         request.setLinhaDigitavel(LINHA_ITAU);
 
@@ -172,26 +152,21 @@ class BoletoServiceTest {
                 .thenReturn(Optional.of(beneficiarioMock));
         when(reportRepository.countByBeneficiario(any(Beneficiario.class))).thenReturn(0);
 
-        // Act
         BoletoResponseDTO response = boletoService.validarBoleto(request);
 
-        // Assert
         assertEquals("Itaú Unibanco", response.getBanco());
     }
 
     @Test
     void deveLidarComBeneficiarioNulo() {
-        // Arrange
         BoletoValidateRequestDTO request = new BoletoValidateRequestDTO();
         request.setLinhaDigitavel(LINHA_BANCO_BRASIL);
 
         when(beneficiarioService.buscarOuCriarBeneficiario(anyString(), anyString(), anyString(), anyString()))
                 .thenReturn(Optional.empty());
 
-        // Act
         BoletoResponseDTO response = boletoService.validarBoleto(request);
 
-        // Assert
         assertNotNull(response);
         assertEquals("Instituição bancária", response.getBeneficiarioNome());
         assertEquals("suspeito", response.getStatusValidacao());
@@ -199,11 +174,9 @@ class BoletoServiceTest {
 
     @Test
     void deveLancarExcecaoParaLinhaDigitavelNula() {
-        // Arrange
         BoletoValidateRequestDTO request = new BoletoValidateRequestDTO();
         request.setLinhaDigitavel(null);
 
-        // Act & Assert
         assertThrows(NullPointerException.class, () -> {
             boletoService.validarBoleto(request);
         });

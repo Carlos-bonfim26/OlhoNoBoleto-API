@@ -87,10 +87,8 @@ class ReportServiceTest {
         return report;
     }
 
-    // ✅ TESTE CORRIGIDO: Criar report com sucesso
     @Test
     void deveCriarReportComSucesso() {
-        // Arrange
         UUID usuarioId = UUID.randomUUID();
         UUID boletoId = UUID.randomUUID();
         UUID beneficiarioId = UUID.randomUUID();
@@ -115,26 +113,22 @@ class ReportServiceTest {
         when(reportRepository.save(any(Report.class))).thenAnswer(invocation -> invocation.getArgument(0));
         when(reportRepository.countByBeneficiarioAndStatus(any(Beneficiario.class), eq(ReportStatus.VALIDADO))).thenReturn(1);
 
-        // Act
         ReportResponseDTO response = reportService.criarReport(request);
 
-        // Assert - AGORA COMPARANDO STRINGS
         assertNotNull(response);
         assertEquals("Boleto Suspeito", response.getTitulo());
         assertEquals("Este boleto parece fraudulento", response.getDescricao());
         assertEquals("FRAUDE", response.getCategoria());
-        assertEquals("PENDENTE", response.getStatus()); // ✅ AGORA É STRING
-        assertEquals("MEDIA", response.getSeveridade()); // ✅ AGORA É STRING
+        assertEquals("PENDENTE", response.getStatus());
+        assertEquals("MEDIA", response.getSeveridade());
         assertNotNull(response.getDataReport());
 
         verify(reportRepository, times(1)).save(any(Report.class));
         verify(beneficiarioRepository, times(1)).save(any(Beneficiario.class));
     }
 
-    // ✅ TESTE CORRIGIDO: Não deve criar report quando usuário já reportou o boleto
     @Test
     void deveLancarExcecaoQuandoUsuarioJaReportouBoleto() {
-        // Arrange
         UUID usuarioId = UUID.randomUUID();
         UUID boletoId = UUID.randomUUID();
 
@@ -144,7 +138,6 @@ class ReportServiceTest {
 
         when(reportRepository.existsByUsuarioIdAndBoletoId(usuarioId, boletoId)).thenReturn(true);
 
-        // Act & Assert - AGORA ESPERA IllegalArgumentException (não BusinessException)
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
             reportService.criarReport(request);
         });
@@ -153,13 +146,8 @@ class ReportServiceTest {
         verify(reportRepository, never()).save(any(Report.class));
     }
 
-    // ❌ REMOVIDO: deveLancarBusinessExceptionParaReportDuplicado
-    // (Não é mais necessário pois o serviço lança IllegalArgumentException primeiro)
-
-    // ✅ TESTE CORRIGIDO: Não deve criar report quando limite de reports pendentes é excedido
-    @Test
+        @Test
     void deveLancarExcecaoQuandoLimiteReportsPendentesExcedido() {
-        // Arrange
         UUID usuarioId = UUID.randomUUID();
         UUID boletoId = UUID.randomUUID();
 
@@ -170,7 +158,6 @@ class ReportServiceTest {
         when(reportRepository.existsByUsuarioIdAndBoletoId(usuarioId, boletoId)).thenReturn(false);
         when(reportRepository.countByUsuarioIdAndStatus(usuarioId, ReportStatus.PENDENTE)).thenReturn(5L);
 
-        // Act & Assert
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
             reportService.criarReport(request);
         });
@@ -179,10 +166,8 @@ class ReportServiceTest {
         verify(reportRepository, never()).save(any(Report.class));
     }
 
-    // ✅ TESTE CORRIGIDO: Deve lançar exceção quando usuário não encontrado
     @Test
     void deveLancarExcecaoQuandoUsuarioNaoEncontrado() {
-        // Arrange
         UUID usuarioId = UUID.randomUUID();
         UUID boletoId = UUID.randomUUID();
 
@@ -194,7 +179,6 @@ class ReportServiceTest {
         when(reportRepository.countByUsuarioIdAndStatus(usuarioId, ReportStatus.PENDENTE)).thenReturn(0L);
         when(usuarioRepository.findById(usuarioId)).thenReturn(Optional.empty());
 
-        // Act & Assert
         EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () -> {
             reportService.criarReport(request);
         });
@@ -202,10 +186,8 @@ class ReportServiceTest {
         assertEquals("Usuário não encontrado", exception.getMessage());
     }
 
-    // ✅ TESTE CORRIGIDO: Listar todos os reports
     @Test
     void deveListarTodosReports() {
-        // Arrange
         User usuario = criarUsuarioCompleto(UUID.randomUUID());
         Boleto boleto = criarBoletoCompleto(UUID.randomUUID());
         Beneficiario beneficiario = criarBeneficiarioCompleto(UUID.randomUUID());
@@ -215,19 +197,15 @@ class ReportServiceTest {
 
         when(reportRepository.findAll()).thenReturn(List.of(report1, report2));
 
-        // Act
         List<ReportResponseDTO> response = reportService.listarTodosReports();
 
-        // Assert
         assertNotNull(response);
         assertEquals(2, response.size());
         verify(reportRepository, times(1)).findAll();
     }
 
-    // ✅ TESTE CORRIGIDO: Atualizar status com sucesso
     @Test
     void deveAtualizarStatusComSucesso() {
-        // Arrange
         UUID reportId = UUID.randomUUID();
         User usuario = criarUsuarioCompleto(UUID.randomUUID());
         Boleto boleto = criarBoletoCompleto(UUID.randomUUID());
@@ -240,22 +218,18 @@ class ReportServiceTest {
         when(reportRepository.save(any(Report.class))).thenReturn(report);
         when(reportRepository.countByBeneficiarioAndStatus(beneficiario, ReportStatus.VALIDADO)).thenReturn(3);
 
-        // Act
         ReportResponseDTO response = reportService.atualizarStatus(reportId, ReportStatus.VALIDADO);
 
-        // Assert - AGORA COMPARANDO STRINGS
         assertNotNull(response);
-        assertEquals("VALIDADO", response.getStatus()); // ✅ AGORA É STRING
+        assertEquals("VALIDADO", response.getStatus());
         assertNotNull(response.getDataReport());
         
         verify(reportRepository, times(1)).save(report);
         verify(beneficiarioRepository, times(1)).save(beneficiario);
     }
 
-    // ✅ TESTE CORRIGIDO: Atualizar status para FALSO
     @Test
     void deveAtualizarStatusParaFalso() {
-        // Arrange
         UUID reportId = UUID.randomUUID();
         User usuario = criarUsuarioCompleto(UUID.randomUUID());
         Boleto boleto = criarBoletoCompleto(UUID.randomUUID());
@@ -267,23 +241,18 @@ class ReportServiceTest {
         when(reportRepository.findById(reportId)).thenReturn(Optional.of(report));
         when(reportRepository.save(any(Report.class))).thenReturn(report);
 
-        // Act
         ReportResponseDTO response = reportService.atualizarStatus(reportId, ReportStatus.FALSO);
 
-        // Assert - AGORA COMPARANDO STRINGS
-        assertEquals("FALSO", response.getStatus()); // ✅ AGORA É STRING
+        assertEquals("FALSO", response.getStatus());
         assertNotNull(response.getDataReport());
         verify(reportRepository, times(1)).save(report);
     }
 
-    // ✅ TESTE CORRIGIDO: Deve lançar exceção quando report não encontrado ao atualizar status
     @Test
     void deveLancarExcecaoQuandoReportNaoEncontradoAoAtualizarStatus() {
-        // Arrange
         UUID reportId = UUID.randomUUID();
         when(reportRepository.findById(reportId)).thenReturn(Optional.empty());
 
-        // Act & Assert
         EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () -> {
             reportService.atualizarStatus(reportId, ReportStatus.VALIDADO);
         });
@@ -291,10 +260,8 @@ class ReportServiceTest {
         assertEquals("Report não encontrado", exception.getMessage());
     }
 
-    // ✅ TESTE CORRIGIDO: Atualizar descrição com sucesso
     @Test
     void deveAtualizarDescricaoComSucesso() {
-        // Arrange
         UUID reportId = UUID.randomUUID();
         String novaDescricao = "Nova descrição detalhada";
         
@@ -308,23 +275,18 @@ class ReportServiceTest {
         when(reportRepository.findById(reportId)).thenReturn(Optional.of(report));
         when(reportRepository.save(any(Report.class))).thenReturn(report);
 
-        // Act
         ReportResponseDTO response = reportService.atualizarDescricao(reportId, novaDescricao);
 
-        // Assert
         assertNotNull(response);
         assertEquals(novaDescricao, response.getDescricao());
         verify(reportRepository, times(1)).save(report);
     }
 
-    // ✅ TESTE CORRIGIDO: Deve lançar exceção quando report não encontrado ao atualizar descrição
     @Test
     void deveLancarExcecaoQuandoReportNaoEncontradoAoAtualizarDescricao() {
-        // Arrange
         UUID reportId = UUID.randomUUID();
         when(reportRepository.findById(reportId)).thenReturn(Optional.empty());
 
-        // Act & Assert
         EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () -> {
             reportService.atualizarDescricao(reportId, "Nova descrição");
         });
@@ -332,10 +294,8 @@ class ReportServiceTest {
         assertEquals("Report não encontrado", exception.getMessage());
     }
 
-    // ✅ TESTE CORRIGIDO: Verificar atualização do contador de denúncias
     @Test
     void deveAtualizarContadorDenunciasCorretamente() {
-        // Arrange
         UUID usuarioId = UUID.randomUUID();
         UUID boletoId = UUID.randomUUID();
         UUID beneficiarioId = UUID.randomUUID();
@@ -360,10 +320,8 @@ class ReportServiceTest {
         when(reportRepository.save(any(Report.class))).thenAnswer(invocation -> invocation.getArgument(0));
         when(reportRepository.countByBeneficiarioAndStatus(beneficiario, ReportStatus.VALIDADO)).thenReturn(5);
 
-        // Act
         reportService.criarReport(request);
 
-        // Assert
         verify(beneficiarioRepository, times(1)).save(beneficiario);
     }
 }

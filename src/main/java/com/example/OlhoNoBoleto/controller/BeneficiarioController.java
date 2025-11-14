@@ -26,9 +26,9 @@ public class BeneficiarioController {
 
     @Autowired
     private BeneficiarioRepository beneficiarioRepository;
-     @Autowired
+    @Autowired
     private BeneficiarioService beneficiarioService;
-       @GetMapping("/buscarPorDocumento/{document}")
+    @GetMapping("/buscarPorDocumento/{document}")
     public ResponseEntity<List<Beneficiario>> buscarPorDocumento(@PathVariable String document) {
         List<Beneficiario> beneficiarios = beneficiarioService.buscarPorCnpjCpf(document);
         return ResponseEntity.ok(beneficiarios);

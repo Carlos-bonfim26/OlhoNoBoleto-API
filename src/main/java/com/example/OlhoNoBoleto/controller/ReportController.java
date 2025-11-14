@@ -37,8 +37,7 @@ public class ReportController {
 
         private final ReportRepository reportRepository;
         private final ReportService reportService;
-        private final UsuarioRepository usuarioRepository; // ✅ Adicionar esta injeção
-
+        private final UsuarioRepository usuarioRepository;
         @GetMapping("/reports")
         public ResponseEntity<?> mostrarReports() {
                 var allReports = reportRepository.findAll();
@@ -58,7 +57,6 @@ public class ReportController {
                 return ResponseEntity.ok(atualizado);
         }
 
-        // Novo endpoint GET /reports para admin listar todos os reports
         @GetMapping("/admin/reports")
         @PreAuthorize("hasRole('ADMIN')")
         public ResponseEntity<List<ReportResponseDTO>> listarTodosReports() {
@@ -66,7 +64,6 @@ public class ReportController {
                 return ResponseEntity.ok(reports);
         }
 
-        // Novo endpoint PUT para atualizar status do report (para admin)
         @PutMapping("/admin/{id}/status")
         @PreAuthorize("hasRole('ADMIN')")
         public ResponseEntity<ReportResponseDTO> atualizarStatus(@PathVariable UUID id,
@@ -77,7 +74,6 @@ public class ReportController {
 
         @GetMapping("/usuario/meus-reports")
         public ResponseEntity<List<ReportResponseDTO>> meusReports(Authentication authentication) {
-                // Buscar reports do usuário logado
                 User usuario = getUsuarioFromAuthentication(authentication);
                 List<Report> reports = reportRepository.findByUsuario(usuario);
                 return ResponseEntity.ok(reports.stream()
@@ -86,7 +82,7 @@ public class ReportController {
         }
 
         private User getUsuarioFromAuthentication(Authentication authentication) {
-                String email = authentication.getName(); // O Spring Security retorna o username (email)
+                String email = authentication.getName();
                 return usuarioRepository.findByEmail(email)
                                 .orElseThrow(() -> new RuntimeException("Usuário não encontrado: " + email));
         }
@@ -94,7 +90,6 @@ public class ReportController {
         @GetMapping("/admin/dashboard")
         @PreAuthorize("hasRole('ADMIN')")
         public ResponseEntity<Map<String, Object>> dashboardAdmin() {
-                // Estatísticas para dashboard
                 long totalReports = reportRepository.count();
                 long reportsPendentes = reportRepository.countByStatus(ReportStatus.PENDENTE);
                 long reportsValidados = reportRepository.countByStatus(ReportStatus.VALIDADO);

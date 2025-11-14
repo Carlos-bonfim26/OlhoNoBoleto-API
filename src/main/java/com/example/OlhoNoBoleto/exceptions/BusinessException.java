@@ -3,7 +3,7 @@ package com.example.OlhoNoBoleto.exceptions;
 import org.springframework.http.HttpStatus;
 
 public class BusinessException extends CustomException{
- public BusinessException(String message) {
+    public BusinessException(String message) {
         super(message, HttpStatus.BAD_REQUEST, "BUSINESS_ERROR");
     }
     
