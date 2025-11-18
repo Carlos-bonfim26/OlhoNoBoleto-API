@@ -1,10 +1,16 @@
-HELP.md
+### Maven ###
 target/
-.mvn/wrapper/maven-wrapper.jar
-!**/src/main/**/target/
-!**/src/test/**/target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+.mvn/tmp/
 
-### STS ###
+### IDE ###
+# STS
 .apt_generated
 .classpath
 .factorypath
@@ -13,30 +19,54 @@ target/
 .springBeans
 .sts4-cache
 
-### IntelliJ IDEA ###
-.idea
+# IntelliJ IDEA
+.idea/
 *.iws
 *.iml
 *.ipr
+*.orig
 
-### NetBeans ###
+# NetBeans
 /nbproject/private/
 /nbbuild/
 /dist/
 /nbdist/
 /.nb-gradle/
 build/
-!**/src/main/**/build/
-!**/src/test/**/build/
 
-### VS Code ###
+# VS Code
 .vscode/
-### Mac ###
+
+### OS ###
+# Mac
 .DS_Store
-application.properties
-maven-wrapper.properties
-### Windows ###
-mvnw.cmd
-mvnw
-#.env
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+### Application ###
+# Environment files
 .env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Logs
+*.log
+logs/
+
+# Temp files
+*.tmp
+*.temp
+
+# Maven Wrapper (se não estiver usando)
+# .mvn/wrapper/maven-wrapper.jar
+# mvnw
+# mvnw.cmd
+
+# Arquivos de configuração específicos (mantenha se necessário)
+# application.properties
+src/main/resources/
