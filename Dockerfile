@@ -5,11 +5,13 @@ RUN mvn clean package -DskipTests
 
 FROM eclipse-temurin:21-jre
 WORKDIR /app
-COPY --from=build /app/target/*.jar app.jar
 
-# Health check (opcional, mas recomendado)
-HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-    CMD curl -f http://localhost:${PORT:-9090}/actuator/health || exit 1
+# Copiando o JAR com nome correto
+COPY --from=build /app/target/OlhoNoBoleto-0.0.1-SNAPSHOT.jar app.jar
+
+# Otimizações para startup mais rápido da JVM
+ENV JAVA_OPTS="-Xss256k -Xmx256m -XX:+UseSerialGC -Dspring.jmx.enabled=false -Dspring.main.lazy-initialization=true"
 
 EXPOSE 9090
-ENTRYPOINT ["sh", "-c", "java -jar -Dserver.port=${PORT:-9090} app.jar"]
+
+ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -jar app.jar"]
