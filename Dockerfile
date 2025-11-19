@@ -12,6 +12,6 @@ COPY --from=build /app/target/OlhoNoBoleto-0.0.1-SNAPSHOT.jar app.jar
 # Otimizações para startup mais rápido da JVM
 ENV JAVA_OPTS="-Xss256k -Xmx256m -XX:+UseSerialGC -Dspring.jmx.enabled=false -Dspring.main.lazy-initialization=true"
 
-EXPOSE 9090
+EXPOSE ${PORT}
 
 ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -jar app.jar"]
