@@ -8,9 +8,17 @@ import org.springframework.context.ConfigurableApplicationContext;
 public class OlhoNoBoletoApplication {
 
 	public static void main(String[] args) {
+		long startTime = System.currentTimeMillis();
+		System.out.println("🚀 Iniciando aplicação...");
+
 		SpringApplication app = new SpringApplication(OlhoNoBoletoApplication.class);
+		app.setLazyInitialization(true);
+		app.setLogStartupInfo(false);
+
 		ConfigurableApplicationContext context = app.run(args);
 
+		long endTime = System.currentTimeMillis();
+		System.out.println("✅ Aplicação iniciada em " + (endTime - startTime) + " ms");
 	}
 
 }
