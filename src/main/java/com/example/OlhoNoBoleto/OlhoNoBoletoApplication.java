@@ -14,8 +14,9 @@ public class OlhoNoBoletoApplication {
 		SpringApplication app = new SpringApplication(OlhoNoBoletoApplication.class);
 		app.setLazyInitialization(true);
 		app.setLogStartupInfo(false);
+		app.setLogStartupInfo(false); // Desliga o log de startup do Spring
 
-		ConfigurableApplicationContext context = app.run(args);
+		app.run(args);
 
 		long endTime = System.currentTimeMillis();
 		System.out.println("✅ Aplicação iniciada em " + (endTime - startTime) + " ms");
