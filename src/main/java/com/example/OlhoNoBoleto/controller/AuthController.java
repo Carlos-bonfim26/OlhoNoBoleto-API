@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import com.example.OlhoNoBoleto.dto.user.UserRequestDTO;
+import com.example.OlhoNoBoleto.dto.user.UserResponseDTO;
 import com.example.OlhoNoBoleto.model.User;
 import com.example.OlhoNoBoleto.repository.UsuarioRepository;
 
@@ -37,8 +38,6 @@ public class AuthController {
         return ResponseEntity.ok("Usuário cadastrado com sucesso");
     }
 
-    // O login agora é tratado automaticamente pelo Spring Security via formLogin()
-    
     @GetMapping("/usuario-atual")
     public ResponseEntity<?> getUsuarioAtual(org.springframework.security.core.Authentication authentication) {
         if (authentication == null || !authentication.isAuthenticated()) {
@@ -49,7 +48,14 @@ public class AuthController {
         User user = usuarioRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
         
-        return ResponseEntity.ok(user);
+        // Retornar DTO sem a senha
+        UserResponseDTO userResponse = new UserResponseDTO();
+        userResponse.setId(user.getId());
+        userResponse.setNome(user.getNome());
+        userResponse.setEmail(user.getEmail());
+        userResponse.setRole(user.getRole());
+        
+        return ResponseEntity.ok(userResponse);
     }
 
     @PutMapping("/atualizar/{id}")
@@ -69,7 +75,6 @@ public class AuthController {
                 .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
 
         if (isAdmin || userLogado.getId().equals(id)) {
-            // Lógica de atualização do usuário
             User userToUpdate = usuarioRepository.findById(id)
                     .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
             

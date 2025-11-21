@@ -23,8 +23,9 @@ public class SecurityConfig {
                 .anyRequest().authenticated())
             .formLogin(form -> form
                 .loginProcessingUrl("/auth/login")
+                .usernameParameter("email")
+                .passwordParameter("senha")
                 .successHandler((request, response, authentication) -> {
-                    // Login bem-sucedido - a sessão será criada automaticamente
                     response.setStatus(200);
                     response.getWriter().write("{\"message\": \"Login bem-sucedido\"}");
                 })
@@ -43,10 +44,6 @@ public class SecurityConfig {
                 .deleteCookies("JSESSIONID")
                 .invalidateHttpSession(true)
                 .permitAll()
-            )
-            .sessionManagement(session -> session
-                .maximumSessions(1)
-                .maxSessionsPreventsLogin(false)
             );
 
         return http.build();
@@ -56,5 +53,4 @@ public class SecurityConfig {
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
-
 }
