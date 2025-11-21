@@ -3,6 +3,8 @@ package com.example.OlhoNoBoleto.controller;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,17 +58,45 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody @Valid LoginRequestDTO loginRequest) {
-        User user = usuarioRepository.findByEmail(loginRequest.getEmail())
-                .orElseThrow(() -> new RuntimeException("Usuário ou senha inválidos"));
+        try {
+            System.out.println("🔐 Tentativa de login para: " + loginRequest.getEmail());
 
-        if (!passwordEncoder.matches(loginRequest.getSenha(), user.getSenha())) {
-            return ResponseEntity.badRequest().body("Usuário ou senha inválidos");
+            User user = usuarioRepository.findByEmail(loginRequest.getEmail())
+                    .orElseThrow(() -> {
+                        System.out.println("❌ Usuário não encontrado: " + loginRequest.getEmail());
+                        return new RuntimeException("Usuário ou senha inválidos");
+                    });
+
+            System.out.println("✅ Usuário encontrado: " + user.getEmail());
+
+            if (!passwordEncoder.matches(loginRequest.getSenha(), user.getSenha())) {
+                System.out.println("❌ Senha incorreta para: " + loginRequest.getEmail());
+                return ResponseEntity.badRequest().body("Usuário ou senha inválidos");
+            }
+
+            System.out.println("✅ Credenciais válidas, gerando tokens...");
+
+            // Gerar tokens
+            String accessToken = jwtService.generateToken(user);
+
+            System.out.println("✅ Tokens gerados com sucesso");
+
+            // Retornar resposta com tokens
+            Map<String, String> response = new HashMap<>();
+            response.put("accessToken", accessToken);
+            response.put("email", user.getEmail());
+            response.put("role", user.getRole().name());
+            response.put("nome", user.getNome());
+
+            System.out.println("✅ Login realizado com sucesso para: " + user.getEmail());
+
+            return ResponseEntity.ok(response);
+
+        } catch (Exception e) {
+            System.err.println("❌ ERRO no login: " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.status(500).body("Erro interno: " + e.getMessage());
         }
-
-        // Gerar token JWT
-        String jwtToken = jwtService.generateToken(user);
-
-        return ResponseEntity.ok(jwtToken);
     }
 
     @PutMapping("atualizar/{id}")

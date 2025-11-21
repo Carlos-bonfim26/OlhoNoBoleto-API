@@ -10,6 +10,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
+
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -20,12 +22,25 @@ public class JwtUtil {
 
     private final SecretKey SECRET_KEY;
     private final long EXPIRATION_TIME = 86400000; // 24 horas
+    
 
-    public JwtUtil(@Value("${jwt.secret}") String secret) {
-        // Converte a string da chave em um SecretKey para HS256
-        this.SECRET_KEY = Keys.hmacShaKeyFor(secret.getBytes());
+  public JwtUtil(@Value("${jwt.secret}") String secretString) {
+        try {
+            System.out.println("🔑 Inicializando JwtService com secret: " + 
+                (secretString != null ? "PRESENTE" : "AUSENTE"));
+            
+            if (secretString == null || secretString.length() < 32) {
+                throw new IllegalArgumentException("JWT secret deve ter pelo menos 32 caracteres");
+            }
+            
+            this.SECRET_KEY = Keys.hmacShaKeyFor(secretString.getBytes(StandardCharsets.UTF_8));
+            System.out.println("✅ JwtService inicializado com sucesso");
+            
+        } catch (Exception e) {
+            System.err.println("❌ Erro ao inicializar JwtService: " + e.getMessage());
+            throw e;
+        }
     }
-
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
     }
