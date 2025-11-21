@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import com.example.OlhoNoBoleto.service.JwtService;
+import com.example.OlhoNoBoleto.service.JwtUtil;
 import com.example.OlhoNoBoleto.dto.user.LoginRequestDTO;
 import com.example.OlhoNoBoleto.dto.user.UserRequestDTO;
 import com.example.OlhoNoBoleto.dto.user.UserResponseDTO;
@@ -37,7 +37,7 @@ public class AuthController {
     @Autowired
     private AuthService authService;
     @Autowired
-    private JwtService jwtService;
+    private JwtUtil jwtService;
 
     @PostMapping("/cadastro")
     public ResponseEntity<?> cadastro(@RequestBody @Valid UserRequestDTO usuario) {
