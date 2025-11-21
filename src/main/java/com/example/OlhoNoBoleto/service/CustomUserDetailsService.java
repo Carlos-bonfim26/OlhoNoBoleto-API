@@ -1,24 +1,24 @@
-package com.example.OlhoNoBoleto.service;
+// package com.example.OlhoNoBoleto.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.stereotype.Service;
+// import org.springframework.beans.factory.annotation.Autowired;
+// import org.springframework.security.core.userdetails.UserDetails;
+// import org.springframework.security.core.userdetails.UserDetailsService;
+// import org.springframework.security.core.userdetails.UsernameNotFoundException;
+// import org.springframework.stereotype.Service;
 
-import com.example.OlhoNoBoleto.model.User;
-import com.example.OlhoNoBoleto.repository.UsuarioRepository;
+// import com.example.OlhoNoBoleto.model.User;
+// import com.example.OlhoNoBoleto.repository.UsuarioRepository;
 
-@Service
-public class CustomUserDetailsService implements UserDetailsService {
+// @Service
+// public class CustomUserDetailsService implements UserDetailsService {
 
-    @Autowired
-    private UsuarioRepository usuarioRepository;
+//     @Autowired
+//     private UsuarioRepository usuarioRepository;
 
-    @Override
-    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        User user = usuarioRepository.findByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado: " + email));
-        return user;
-    }
-}
+//     @Override
+//     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+//         User user = usuarioRepository.findByEmail(email)
+//                 .orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado: " + email));
+//         return user;
+//     }
+// }
