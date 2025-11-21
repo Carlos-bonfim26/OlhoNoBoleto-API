@@ -96,8 +96,7 @@ public class BoletoService {
             Map.entry("102", "02332886000104"),
             Map.entry("120", "01634601000140"),
             Map.entry("184", "33657200000120"),
-            Map.entry("746", "61532679000150")
-    );
+            Map.entry("746", "61532679000150"));
 
     private String obterNomeBanco(String codigoBanco) {
         return CODIGO_PARA_NOME_BANCO.getOrDefault(codigoBanco, "Banco desconhecido");
@@ -172,7 +171,9 @@ public class BoletoService {
 
     public BoletoResponseDTO validarBoleto(BoletoValidateRequestDTO request) {
         String linha = request.getLinhaDigitavel().trim();
-
+        if (linha == null || linha.trim().isEmpty()) {
+            throw new IllegalArgumentException("Linha digitável inválida");
+        }
         if (linha.length() != 47 && linha.length() != 48) {
             throw new IllegalArgumentException("Linha digitável inválida: deve conter 47 ou 48 dígitos.");
         }
@@ -325,7 +326,6 @@ public class BoletoService {
         }
 
         String codigoBanco = linha.substring(0, 3);
-
 
         if (BANCO_PARA_CNPJ.containsKey(codigoBanco)) {
             return linha.substring(19, 23);
