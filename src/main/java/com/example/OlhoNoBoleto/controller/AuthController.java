@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
+import com.example.OlhoNoBoleto.service.JwtService;
 import com.example.OlhoNoBoleto.dto.user.LoginRequestDTO;
 import com.example.OlhoNoBoleto.dto.user.UserRequestDTO;
 import com.example.OlhoNoBoleto.dto.user.UserResponseDTO;
@@ -36,6 +36,8 @@ public class AuthController {
     private PasswordEncoder passwordEncoder;
     @Autowired
     private AuthService authService;
+    @Autowired
+    private JwtService jwtService;
 
     @PostMapping("/cadastro")
     public ResponseEntity<?> cadastro(@RequestBody @Valid UserRequestDTO usuario) {
@@ -56,16 +58,21 @@ public class AuthController {
     public ResponseEntity<?> login(@RequestBody @Valid LoginRequestDTO loginRequest) {
         User user = usuarioRepository.findByEmail(loginRequest.getEmail())
                 .orElseThrow(() -> new RuntimeException("Usuário ou senha inválidos"));
+
         if (!passwordEncoder.matches(loginRequest.getSenha(), user.getSenha())) {
             return ResponseEntity.badRequest().body("Usuário ou senha inválidos");
         }
-        return ResponseEntity.ok("Login bem-sucedido para o usuário: " + loginRequest.getEmail());
+
+        // Gerar token JWT
+        String jwtToken = jwtService.generateToken(user);
+
+        return ResponseEntity.ok(jwtToken);
     }
 
     @PutMapping("atualizar/{id}")
     public ResponseEntity<?> atualizarUsuario(@RequestBody @Valid UserRequestDTO usuario, @PathVariable UUID id,
             Authentication authenticator) {
-        UserDetails userLogado = (UserDetails) authenticator.getPrincipal(); 
+        UserDetails userLogado = (UserDetails) authenticator.getPrincipal();
         User userDoBanco = usuarioRepository.findByEmail(userLogado.getUsername())
                 .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
 
