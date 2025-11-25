@@ -4,7 +4,6 @@ import com.example.OlhoNoBoleto.dto.report.ReportRequest;
 import com.example.OlhoNoBoleto.dto.report.ReportResponseDTO;
 import com.example.OlhoNoBoleto.enums.ReportSeverity;
 import com.example.OlhoNoBoleto.enums.ReportStatus;
-import com.example.OlhoNoBoleto.exceptions.BusinessException;
 import com.example.OlhoNoBoleto.model.Beneficiario;
 import com.example.OlhoNoBoleto.model.Boleto;
 import com.example.OlhoNoBoleto.model.Report;
