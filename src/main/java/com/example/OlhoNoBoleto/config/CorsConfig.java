@@ -1,4 +1,3 @@
-// src/main/java/com/example/olhoNoBoleto/config/CorsConfig.java
 package com.example.OlhoNoBoleto.config;
 
 import org.springframework.context.annotation.Bean;
