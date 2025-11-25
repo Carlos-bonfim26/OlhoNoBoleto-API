@@ -60,19 +60,12 @@ public class SecurityConfig {
                         .usernameParameter("email")
                         .passwordParameter("senha")
                         .successHandler((request, response, authentication) -> {
-                            // 🔥 ADICIONE LOGS PARA DEBUG
                             System.out.println("✅ Login BEM-SUCEDIDO para: " + authentication.getName());
                             System.out.println("✅ Authorities: " + authentication.getAuthorities());
 
                             response.setStatus(200);
                             response.setContentType("application/json");
-
-                            // 🔥 Tente retornar mais informações
-                            User user = (User) authentication.getPrincipal();
-                            String jsonResponse = String.format(
-                                    "{\"message\": \"Login bem-sucedido\", \"email\": \"%s\", \"role\": \"%s\"}",
-                                    user.getEmail(), user.getRole().name());
-                            response.getWriter().write(jsonResponse);
+                            response.getWriter().write("{\"message\": \"Login bem-sucedido\"}");
                         })
                         .failureHandler((request, response, exception) -> {
                             System.out.println("❌ FALHA no login: " + exception.getMessage());
