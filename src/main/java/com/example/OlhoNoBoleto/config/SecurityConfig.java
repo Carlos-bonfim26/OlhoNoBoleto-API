@@ -17,6 +17,10 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import com.example.OlhoNoBoleto.dto.user.UserResponseDTO;
+import com.example.OlhoNoBoleto.model.User;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
@@ -44,24 +48,34 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/cadastro", "/auth/login",
-                                "/swagger-ui/**", "/v3/api-docs/**")
+                        .requestMatchers("/auth/cadastro", "/auth/login", "/auth/verificar-login",
+                                "/swagger-ui/**", "/v3/api-docs/**", "/test/**")
                         .permitAll()
                         .requestMatchers(HttpMethod.GET, "/auth/usuarios").hasRole("ADMIN")
                         .anyRequest().authenticated())
                 .exceptionHandling(exception -> exception
-                        .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
-                )
+                        .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))
                 .formLogin(form -> form
                         .loginProcessingUrl("/auth/login")
                         .usernameParameter("email")
                         .passwordParameter("senha")
                         .successHandler((request, response, authentication) -> {
+                            // 🔥 ADICIONE LOGS PARA DEBUG
+                            System.out.println("✅ Login BEM-SUCEDIDO para: " + authentication.getName());
+                            System.out.println("✅ Authorities: " + authentication.getAuthorities());
+
                             response.setStatus(200);
                             response.setContentType("application/json");
-                            response.getWriter().write("{\"message\": \"Login bem-sucedido\"}");
+
+                            // 🔥 Tente retornar mais informações
+                            User user = (User) authentication.getPrincipal();
+                            String jsonResponse = String.format(
+                                    "{\"message\": \"Login bem-sucedido\", \"email\": \"%s\", \"role\": \"%s\"}",
+                                    user.getEmail(), user.getRole().name());
+                            response.getWriter().write(jsonResponse);
                         })
                         .failureHandler((request, response, exception) -> {
+                            System.out.println("❌ FALHA no login: " + exception.getMessage());
                             response.setStatus(401);
                             response.setContentType("application/json");
                             response.getWriter().write("{\"message\": \"Credenciais inválidas\"}");
