@@ -9,6 +9,4 @@ import com.example.OlhoNoBoleto.model.User;
 
 public interface UsuarioRepository extends JpaRepository<User, UUID> {
     Optional<User> findByEmail(String email);
-    Optional<User> findByNome(String nome);
-
 }
